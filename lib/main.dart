@@ -23,12 +23,66 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class FieldScreen extends StatefulWidget {
+class CommandRow extends StatefulWidget {
+  final String title;
+
+  const CommandRow({super.key, required this.title});
+
+  @override
+  State<CommandRow> createState() => _CommandRowState();
+}
+
+class _CommandRowState extends State<CommandRow> {
+  double value = 0.5;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          // Left circle button
+          IconButton(
+            onPressed: () {
+              // left action
+            },
+            icon: const Icon(Icons.remove_red_eye_outlined),
+            color: Colors.lightBlueAccent,
+            iconSize: 28,
+          ),
+
+          // Slider expands
+          Expanded(
+            child: Slider(
+              value: value,
+              onChanged: (v) => setState(() => value = v),
+              min: 0,
+              max: 1,
+            ),
+          ),
+
+          // Right circle button
+          IconButton(
+            onPressed: () {
+              // right action
+            },
+            icon: const Icon(Icons.add_circle),
+            color: Colors.lightBlueAccent,
+            iconSize: 28,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class FieldScreen extends StatefulWidget { //main UI
   const FieldScreen({super.key});
 
   @override
   State<FieldScreen> createState() => _FieldScreenState();
 }
+final items = List<String>.generate(30, (i) => 'Item $i'); // Sample data source
 
 class _FieldScreenState extends State<FieldScreen> {
   double tValue = 0.0; // 0..1 for robot preview
@@ -61,10 +115,18 @@ class _FieldScreenState extends State<FieldScreen> {
                     padding: const EdgeInsets.all(12),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text('Command Panel', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                        SizedBox(height: 8),
-                        Text('(Sidebar for commands, sequence, and options)', style: TextStyle(color: Colors.white70)),
+                      children: [
+                        const Text('Command Panel', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 8),
+                        const Text('(Sidebar for commands, sequence, and options)', style: TextStyle(color: Colors.white70)),
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: items.length,
+                            itemBuilder: (context, index) {
+                              return CommandRow(title: items[index]);
+                            },
+                          )
+                        )
                       ],
                     ),
                   ),
@@ -192,50 +254,34 @@ class FieldView extends StatefulWidget {
   State<FieldView> createState() => _FieldViewState();
 }
 
-abstract class PathSegment {
-  final Offset start;
-  final Offset end;
+class Waypoint {
+  Offset pos;
+  Offset? handleIn;
+  Offset? handleOut;
 
-  // Standard constructor (no change here)
-  PathSegment({required this.start, required this.end});
-}
-
-class LineSegment extends PathSegment {
-  LineSegment({required super.start, required super.end});
-}
-
-class BezierSegment extends PathSegment {
-  final Offset control1;
-  final Offset control2;
-
-  BezierSegment({
-    required super.start,
-    required super.end,
-    required this.control1,
-    required this.control2,
+  Waypoint({
+    required this.pos,
+    this.handleIn,
+    this.handleOut,
   });
 }
 
-class RobotPath { List<PathSegment> segments = []; }
-
-class EditableSegment {
-  Offset start;
-  Offset end;
-  Offset? control1; // optional for Bezier
-  Offset? control2; // optional for Bezier
-
-  EditableSegment({
-    required this.start,
-    required this.end,
-    this.control1,
-    this.control2,
-  });
-}
 double fieldHalf = 72.6; // inches
-final pointRadius = 2.0; // 2 inches
+const handleRadius = 2.0; // 2 inches
+
+double distanceFormula(Offset prevPos, Offset pos) {
+  final dist = sqrt(pow((pos.dy-prevPos.dy),2) + pow((pos.dx-prevPos.dx),2));
+  return dist;
+}
+
+Offset computeHandleOffset(Offset prevPos, Offset pos, [double? setLength]) {
+  final angle = atan2(pos.dy - prevPos.dy, pos.dx - prevPos.dx);
+  final effectiveLength = setLength ?? distanceFormula(prevPos, pos);
+  return Offset.fromDirection(angle, effectiveLength/2.0);
+}
+
 class _FieldViewState extends State<FieldView> {
-  RobotPath robotPath = RobotPath();
-  List<EditableSegment> segments = [];
+  List<Waypoint> waypoints = [];
   DragTargetInfo? dragging;
 
   ui.Image? fieldImage; // Field background
@@ -251,22 +297,6 @@ class _FieldViewState extends State<FieldView> {
     final bytes = data.buffer.asUint8List();
     final img = await decodeImageFromList(bytes);
     setState(() => fieldImage = img);
-  }
-
-  void _updateRobotPath() {
-    robotPath.segments.clear();
-    for (var s in segments) {
-      if (s.control1 != null && s.control2 != null) {
-        robotPath.segments.add(BezierSegment(
-          start: s.start,
-          end: s.end,
-          control1: s.control1!,
-          control2: s.control2!,
-        ));
-      } else {
-        robotPath.segments.add(LineSegment(start: s.start, end: s.end));
-      }
-    }
   }
 
   Offset toScreen(Offset logical, Size size) {
@@ -285,14 +315,23 @@ class _FieldViewState extends State<FieldView> {
     return (screen - center) / dynamicScale;
   }
 
-  DragTargetInfo? _hitTest(Offset logical, double dynamicScale) {
-    final handleRadius = 2.0 * dynamicScale; // 2 inches in logical units
-    for (int i = 0; i < segments.length; i++) {
-      final s = segments[i];
-      if ((s.start - logical).distance <= handleRadius) return DragTargetInfo(index: i, type: SegmentDragType.start);
-      if ((s.end - logical).distance <= handleRadius) return DragTargetInfo(index: i, type: SegmentDragType.end);
-      if (s.control1 != null && (s.control1! - logical).distance <= handleRadius) return DragTargetInfo(index: i, type: SegmentDragType.control1);
-      if (s.control2 != null && (s.control2! - logical).distance <= handleRadius) return DragTargetInfo(index: i, type: SegmentDragType.control2);
+  DragTargetInfo? _hitTest(Offset logical) {
+    for (int i = 0; i < waypoints.length; i++) {
+      final s = waypoints[i];
+
+      if ((s.pos - logical).distance <= handleRadius) {
+        return DragTargetInfo(index: i, type: SegmentDragType.pos);
+      }
+
+      if (s.handleIn != null &&
+          (s.handleIn! - logical).distance <= handleRadius) {
+        return DragTargetInfo(index: i, type: SegmentDragType.handleIn);
+      }
+
+      if (s.handleOut != null &&
+          (s.handleOut! - logical).distance <= handleRadius) {
+        return DragTargetInfo(index: i, type: SegmentDragType.handleOut);
+      }
     }
     return null;
   }
@@ -302,76 +341,60 @@ class _FieldViewState extends State<FieldView> {
     return LayoutBuilder(builder: (context, constraints) {
       final size = constraints.biggest;
 
-      final scaleX = size.width / (fieldHalf * 2);
-      final scaleY = size.height / (fieldHalf * 2);
-      final dynamicScale = min(scaleX, scaleY);
-
       return GestureDetector(
         behavior: HitTestBehavior.opaque,
+        onTapDown: (details) {
+          setState(() {
+            dragging = _hitTest(toLogical(details.localPosition, size));
+          });
+        },
         onDoubleTapDown: (details) {
           setState(() {
-            final clickPos = details.localPosition;
-            Offset start;
-            Offset end = toLogical(clickPos, size);
-
-            if (segments.isEmpty) {
-              start = end; // first point at click
+            var realClickPos = toLogical(details.localPosition, size);
+            if (waypoints.isEmpty) {
+              final secondWaypointPos = realClickPos + Offset(10,10);
+              waypoints.add(Waypoint(pos: realClickPos, handleOut: realClickPos + Offset(0,10)));
+              waypoints.add(Waypoint(pos: secondWaypointPos, handleIn: secondWaypointPos + Offset(0,10)));
             } else {
-              start = segments.last.end; // chain from last end
+              final prevLastWaypoint = waypoints[waypoints.length-2];
+              waypoints.last.handleOut = waypoints.last.pos + computeHandleOffset(prevLastWaypoint.pos, waypoints.last.pos, distanceFormula(realClickPos, waypoints.last.pos));
+              waypoints.add(Waypoint(pos: realClickPos, handleIn: realClickPos + computeHandleOffset(realClickPos, waypoints.last.pos)));
             }
-
-            segments.add(EditableSegment(
-              start: start,
-              end: end,
-              control1: start + const Offset(5, 5),
-              control2: end + const Offset(5, -5),
-            ));
-
-            _updateRobotPath();
           });
         },
         onSecondaryTapDown: (details) {
           setState(() {
-            final clickPos = details.localPosition;
-            Offset start;
+            var realClickPos = toLogical(details.localPosition, size);
 
-            if (segments.isEmpty) start = toLogical(clickPos, size);
-            else start = segments.last.end;
+            bool wasEmpty = waypoints.isEmpty;
+            waypoints.add(Waypoint(pos: realClickPos));
 
-            segments.add(EditableSegment(
-              start: start,
-              end: toLogical(clickPos, size),
-            ));
-
-            _updateRobotPath();
+            if (wasEmpty) {
+              waypoints.add(Waypoint(pos: realClickPos + Offset(10,10)));
+            }
           });
         },
         onPanStart: (details) {
           final logical = toLogical(details.localPosition, size);
-          dragging = _hitTest(logical, dynamicScale);
+          dragging = _hitTest(logical);
         },
         onPanUpdate: (details) {
           if (dragging != null) {
             setState(() {
               final newLogical = toLogical(details.localPosition, size);
-              final seg = segments[dragging!.index];
+              final waypoint = waypoints[dragging!.index];
 
               switch (dragging!.type) {
-                case SegmentDragType.start:
-                  seg.start = newLogical;
+                case SegmentDragType.pos:
+                  waypoint.pos = newLogical;
                   break;
-                case SegmentDragType.end:
-                  seg.end = newLogical;
+                case SegmentDragType.handleIn: //rename control1
+                  waypoint.handleIn = newLogical;
                   break;
-                case SegmentDragType.control1:
-                  seg.control1 = newLogical;
-                  break;
-                case SegmentDragType.control2:
-                  seg.control2 = newLogical;
+                case SegmentDragType.handleOut:
+                  waypoint.handleOut = newLogical;
                   break;
               }
-
-              _updateRobotPath();
             });
           }
         },
@@ -379,7 +402,7 @@ class _FieldViewState extends State<FieldView> {
         child: CustomPaint(
           size: size,
           painter: _FieldPainter(
-            segments: segments,
+            waypointList: waypoints,
             toScreen: (o) => toScreen(o, size),
             fieldImage: fieldImage,
           ),
@@ -390,12 +413,12 @@ class _FieldViewState extends State<FieldView> {
 }
 
 class _FieldPainter extends CustomPainter {
-  final List<EditableSegment> segments;
+  final List<Waypoint> waypointList;
   final ui.Image? fieldImage;
-  final Offset Function(Offset) toScreen;
+  final Offset Function(Offset) toScreen; 
 
   _FieldPainter({
-    required this.segments,
+    required this.waypointList,
     required this.toScreen,
     this.fieldImage,
   });
@@ -424,7 +447,6 @@ class _FieldPainter extends CustomPainter {
       );
     }
 
-    // Draw segments and handles
     final paintLine = Paint()
       ..color = Colors.lightBlueAccent
       ..style = PaintingStyle.stroke
@@ -435,30 +457,32 @@ class _FieldPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5 / dynamicScale;
 
-    final handleRadius = pointRadius * dynamicScale; // 2 inches scaled
+    final drawingRadius = handleRadius * dynamicScale; // 2 inches scaled
 
-    for (var s in segments) {
-      final start = toScreen(s.start);
-      final end = toScreen(s.end);
-      final control1 = s.control1 != null ? toScreen(s.control1!) : null;
-      final control2 = s.control2 != null ? toScreen(s.control2!) : null;
+    for (int i = 0; i < waypointList.length - 1; i++) {
+      final waypoint1 = waypointList[i];
+      final waypoint2 = waypointList[i+1];
+      final waypoint1pos = toScreen(waypoint1.pos);
+      final waypoint2pos = toScreen(waypoint2.pos);
+      final control1 = waypoint1.handleOut != null ? toScreen(waypoint1.handleOut!) : null;
+      final control2 = waypoint2.handleIn != null ? toScreen(waypoint2.handleIn!) : null;
 
       if (control1 != null && control2 != null) {
         final path = Path()
-          ..moveTo(start.dx, start.dy)
-          ..cubicTo(control1.dx, control1.dy, control2.dx, control2.dy, end.dx, end.dy);
+          ..moveTo(waypoint1pos.dx, waypoint1pos.dy)
+          ..cubicTo(control1.dx, control1.dy, control2.dx, control2.dy, waypoint2pos.dx, waypoint2pos.dy);
         canvas.drawPath(path, paintLine);
 
-        canvas.drawLine(start, control1, paintHandle);
-        canvas.drawLine(end, control2, paintHandle);
-        canvas.drawCircle(control1, handleRadius, paintHandle);
-        canvas.drawCircle(control2, handleRadius, paintHandle);
+        canvas.drawLine(waypoint1pos, control1, paintHandle);
+        canvas.drawLine(waypoint2pos, control2, paintHandle);
+        canvas.drawCircle(control1, drawingRadius, paintHandle);
+        canvas.drawCircle(control2, drawingRadius, paintHandle);
       } else {
-        canvas.drawLine(start, end, paintLine);
+        canvas.drawLine(waypoint1pos, waypoint2pos, paintLine);
       }
 
-      canvas.drawCircle(start, handleRadius, paintHandle);
-      canvas.drawCircle(end, handleRadius, paintHandle);
+      canvas.drawCircle(waypoint1pos, drawingRadius, paintHandle);
+      canvas.drawCircle(waypoint2pos, drawingRadius, paintHandle);
     }
   }
 
@@ -468,7 +492,7 @@ class _FieldPainter extends CustomPainter {
 
 
 
-enum SegmentDragType { start, end, control1, control2 }
+enum SegmentDragType { pos, handleIn, handleOut }
 
 class DragTargetInfo {
   final SegmentDragType type;
