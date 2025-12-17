@@ -15,7 +15,36 @@ class Waypoint {
   });
 }
 
+class Command {
+  double? t;
+  CommandName? name;
+  CommandType? type;
+
+  Command({
+    required this.t,
+    required this.name,
+    required this.type,
+  });
+}
+
+
+class CommandList extends ChangeNotifier {
+  final List<Command> commands = [];
+
+  void addCommand(Command cmd) {
+    commands.add(cmd);
+    notifyListeners();
+  }
+  
+  void modifyCommand(int i, Command cmd) { //check for t
+    commands[i] = cmd;
+    notifyListeners();
+  }
+}
+
 enum SegmentDragType { pos, handleIn, handleOut }
+enum CommandName {intake, longgoal, uppercentergoal, matchloader}
+enum CommandType {enable, disable}
 
 class DragTargetInfo {
   final SegmentDragType type;

@@ -7,8 +7,11 @@ import 'package:graveyard_shift_simulator/screens/planner_screen.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => PathModel(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => PathModel()),
+        ChangeNotifierProvider(create: (_) => CommandList()),
+      ],
       child: const MyApp(),
     ),
   );

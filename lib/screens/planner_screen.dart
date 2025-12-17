@@ -13,16 +13,18 @@ class PlannerScreen extends StatefulWidget { //main UI
   @override
   State<PlannerScreen> createState() => _PlannerScreenState();
 }
-final items = List<String>.generate(30, (i) => 'Item $i'); // Sample data source
 
 class _PlannerScreenState extends State<PlannerScreen> {
   double tValue = 0.0; // 0..1 for robot preview
   double speedMin = 0.0;
   double speedMax = 200.0;
 
+  bool displayWaypoints = true;
+
   @override
   Widget build(BuildContext context) {
     final waypoints = context.watch<PathModel>().waypoints;
+    final commandList = context.watch<CommandList>();
     return Scaffold(
       body: Column(
         children: [
@@ -71,21 +73,64 @@ class _PlannerScreenState extends State<PlannerScreen> {
       Expanded( 
         child: Container(
           color: Colors.grey.shade800,
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Command Panel', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 1, 
+                    child: ElevatedButton(
+                      onPressed:() {
+                        setState(() {
+                          displayWaypoints = true;
+                        });
+                      },
+                      child: const Text('Waypoints', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Expanded(
+                    flex: 1, 
+                    child: ElevatedButton(
+                      onPressed:() {
+                        setState(() {
+                          displayWaypoints = false;
+                        });
+                      },
+                      child: const Text('Commands', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 8),
-              const Text('(Sidebar for commands, sequence, and options)', style: TextStyle(color: Colors.white70)),
-              
-              Expanded(
-                child: ListView.builder(
-                  itemCount: waypoints.length,
-                  itemBuilder: (context, index) => ExplorerRow(index: index),
-                ),
+              Row(
+                children: [
+                  if(displayWaypoints)
+                    const Text('Waypoints Manager', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  if(!displayWaypoints)
+                    const Text('Commands Manager', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    IconButton(onPressed:() => commandList.addCommand(Command(t: 1.0, name: CommandName.intake, type: CommandType.enable)), icon: Icon(Icons.add_circle), iconSize: 30, color: Colors.pink),
+                ],
               ),
               
+              
+              if (displayWaypoints) 
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: waypoints.length,
+                    itemBuilder: (context, index) => WaypointRow(index: index),
+                  ),
+                ),
+              if (!displayWaypoints)
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: commandList.commands.length,
+                    itemBuilder: (context, index) => CommandRow(index: index),
+                  ),
+                ),
+
               const SizedBox(height: 16),
               
               Container(
