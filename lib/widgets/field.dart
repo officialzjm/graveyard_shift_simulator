@@ -4,6 +4,9 @@ import 'dart:ui' as ui;
 import 'dart:math';
 import 'package:provider/provider.dart';
 import 'package:graveyard_shift_simulator/models/path_structure.dart';
+import 'package:graveyard_shift_simulator/bezierinfo.dart';
+import 'package:graveyard_shift_simulator/constants.dart';
+
 
 class FieldView extends StatefulWidget {
   final double tValue;
@@ -12,9 +15,6 @@ class FieldView extends StatefulWidget {
   @override
   State<FieldView> createState() => _FieldViewState();
 }
-
-double fieldHalf = 72.6; // inches
-const handleRadius = 2.0; // 2 inches
 
 class _FieldViewState extends State<FieldView> {
   DragTargetInfo? dragging;
@@ -95,7 +95,7 @@ class _FieldViewState extends State<FieldView> {
             final prevLast = waypoints[waypoints.length - 2];
             final last = waypoints.last;
             final newHandleOut = last.pos + computeHandleOffset(prevLast.pos, last.pos, distanceFormula(realClickPos, last.pos));
-            final updatedLast = Waypoint(pos: last.pos, handleIn: last.handleIn, handleOut: newHandleOut);
+            final updatedLast = Waypoint(pos: last.pos, handleIn: last.handleIn, handleOut: newHandleOut, visible: last.visible, reversed: last.reversed);
             pathModel.updateWaypoint(waypoints.length - 1, updatedLast);
             pathModel.addWaypoint(Waypoint(pos: realClickPos, handleIn: realClickPos + computeHandleOffset(realClickPos, waypoints.last.pos)));
           }
@@ -115,7 +115,7 @@ class _FieldViewState extends State<FieldView> {
           dragging = _hitTest(logical);
         },
         onPanUpdate: (details) {
-          if (dragging != null) {
+          if (dragging != null && waypoints[dragging!.index].visible == true) {
             final newLogical = toLogical(details.localPosition, size);
             pathModel.updateWaypoint(dragging!.index, Waypoint(
               pos: dragging!.type == SegmentDragType.pos 
@@ -127,6 +127,7 @@ class _FieldViewState extends State<FieldView> {
               handleOut: dragging!.type == SegmentDragType.pos
                   ? (waypoints[dragging!.index].handleOut ?? Offset.zero) + (newLogical - waypoints[dragging!.index].pos)
                   : (dragging!.type == SegmentDragType.handleOut ? newLogical : waypoints[dragging!.index].handleOut),
+              reversed: waypoints[dragging!.index].reversed,
             ));
           }
         },
@@ -195,25 +196,50 @@ class _FieldPainter extends CustomPainter {
 
     final drawingRadius = handleRadius * dynamicScale; // 2 inches scaled
 
+    final paintLine2 = Paint()
+      ..style = PaintingStyle.fill//x
+      ..strokeWidth = 15 / dynamicScale;
+
     for (int i = 0; i < waypoints.length - 1; i++) {
       if (waypoints[i].visible) {
         final waypoint1 = waypoints[i];
         final waypoint2 = waypoints[i+1];
         final waypoint1pos = toScreen(waypoint1.pos);
         final waypoint2pos = toScreen(waypoint2.pos);
-        final control1 = waypoint1.handleOut != null ? toScreen(waypoint1.handleOut!) : null;
-        final control2 = waypoint2.handleIn != null ? toScreen(waypoint2.handleIn!) : null;
+        final control1pos = waypoint1.handleOut != null ? toScreen(waypoint1.handleOut!) : null;
+        final control2pos = waypoint2.handleIn != null ? toScreen(waypoint2.handleIn!) : null;
 
-        if (control1 != null && control2 != null) {
+        if (control1pos != null && control2pos != null) {
+          /*
           final path = Path()
             ..moveTo(waypoint1pos.dx, waypoint1pos.dy)
             ..cubicTo(control1.dx, control1.dy, control2.dx, control2.dy, waypoint2pos.dx, waypoint2pos.dy);
           canvas.drawPath(path, paintLine);
 
-          canvas.drawLine(waypoint1pos, control1, paintHandle);
-          canvas.drawLine(waypoint2pos, control2, paintHandle);
-          canvas.drawCircle(control1, drawingRadius, paintHandle);
-          canvas.drawCircle(control2, drawingRadius, paintHandle);
+          
+          */
+          int samplesPerSegment = 50;
+          for (int s = 0; s < samplesPerSegment; s++) {
+            final t0 = s / samplesPerSegment;
+            final t1 = (s + 1) / samplesPerSegment;
+
+            final pA = cubicPoint(waypoint1pos, control1pos, control2pos, waypoint2pos, t0);
+            final pB = cubicPoint(waypoint1pos, control1pos, control2pos, waypoint2pos, t1);
+
+            //final v = ui.lerpDouble(waypoint1.velocity, waypoint2.velocity, t0);
+            //if (v != null) {continue;}
+            final v = 60.0; //change
+            paintLine2
+              ..color = velocityToColor(v)
+              ..style = PaintingStyle.stroke;
+
+            canvas.drawLine(pA, pB, paintLine2);
+            canvas.drawLine(waypoint1pos, control1pos, paintHandle);
+            canvas.drawLine(waypoint2pos, control2pos, paintHandle);
+            canvas.drawCircle(control1pos, drawingRadius, paintHandle);
+            canvas.drawCircle(control2pos, drawingRadius, paintHandle);
+          }
+
         } else {
           canvas.drawLine(waypoint1pos, waypoint2pos, paintLine);
         }

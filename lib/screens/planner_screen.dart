@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:graveyard_shift_simulator/models/path_structure.dart';
 import 'package:graveyard_shift_simulator/widgets/explorer_row.dart';
 import 'package:graveyard_shift_simulator/widgets/field.dart';
-import 'package:graveyard_shift_simulator/widgets/velocity_graph.dart';
+import 'package:graveyard_shift_simulator/jsonconversion.dart';
 
 
 
@@ -37,6 +37,15 @@ class _PlannerScreenState extends State<PlannerScreen> {
                 const Text(
                   'Planner',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const Spacer(),
+                IconButton(
+                  icon: const Icon(Icons.download),
+                  onPressed: () {
+                    List<Segment> segments = createSegmentList(waypoints);
+                    String jsonPath = createPathJson(segments: segments, commands: commandList.commands);
+                    downloadJsonWeb(jsonPath, 'Path1');
+                  },
                 ),
                 /*
                 const Spacer(),
@@ -179,45 +188,6 @@ class _PlannerScreenState extends State<PlannerScreen> {
               
               const SizedBox(height: 8),
 
-              // Replace the old speed profile Container with:
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade700,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('Velocity Graph', style: TextStyle(fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 8),
-                      Expanded(
-                        child: LayoutBuilder(
-                          builder: (context, constraints) {
-                            return GestureDetector(
-                              onTapDown: (details) {
-                                final pathModel = context.read<PathModel>();
-                                final t = (details.localPosition.dx / constraints.maxWidth).clamp(0.0, 1.0);
-                                final v = speedMax - (details.localPosition.dy / constraints.maxHeight) * (speedMax - speedMin);
-                                pathModel.addVelocityPoint(VelocityPoint(t: t, v: v.clamp(speedMin, speedMax)));
-                              },
-                              child: CustomPaint(
-                                size: Size(constraints.maxWidth, constraints.maxHeight),
-                                painter: VelocityGraphPainter(
-                                  points: context.watch<PathModel>().velocityPoints,
-                                  minV: speedMin,
-                                  maxV: speedMax,
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
             ],
           ),
         ),

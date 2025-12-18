@@ -1,3 +1,4 @@
+import 'package:graveyard_shift_simulator/constants.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
 
@@ -5,28 +6,70 @@ class Waypoint {
   Offset pos;
   Offset? handleIn;
   Offset? handleOut;
+  double velocity;
+  double accel;
   bool visible;
+  bool reversed;
 
   Waypoint({
     required this.pos,
     this.handleIn,
     this.handleOut,
+    this.velocity = maxVelocity,
+    this.accel = 1,
     this.visible = true,
+    this.reversed = false,
   });
+
+  Map<String, dynamic> toJson() => {'x': pos.dx, 'y': pos.dy};
 }
 
 class Command {
-  double? t;
-  CommandName? name;
+  double t;
+  CommandName name;
   CommandType? type;
 
   Command({
-    required this.t,
-    required this.name,
+    this.t = 0,
+    this.name = CommandName.intake,
     required this.type,
   });
+
+  Map<String, dynamic> toJson() => {'t': t.toPrecision(4), 'name': name.name};
+}
+extension DoublePrecision on double {
+  double toPrecision(int n) => double.parse(toStringAsFixed(n));
 }
 
+extension OffsetJson on Offset {
+  Map<String, double> toJson() => {
+    'x': dx.toPrecision(4),
+    'y': dy.toPrecision(4),
+  };
+}
+
+class Segment {
+  final bool inverted;
+  final bool stopEnd;
+  final List<Offset> path;
+  final double velocity;
+  final double accel;
+
+  Segment({
+    required this.inverted,
+    required this.stopEnd,
+    required this.path,
+    required this.velocity,
+    required this.accel,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'inverted': inverted,
+    'stop_end': stopEnd,
+    'path': path.map((p) => p.toJson()).toList(),
+    'constraints': {'velocity': velocity, 'accel': accel},
+  };
+}
 
 class CommandList extends ChangeNotifier {
   final List<Command> commands = [];
@@ -35,7 +78,17 @@ class CommandList extends ChangeNotifier {
     commands.add(cmd);
     notifyListeners();
   }
+
+  void changeCmdT(int i, double t) {
+    commands[i].t = t;
+    notifyListeners();
+  }
   
+  void removeCommand(int i) {
+    commands.removeAt(i);
+    notifyListeners();
+  }
+
   void modifyCommand(int i, Command cmd) { //check for t
     commands[i] = cmd;
     notifyListeners();
@@ -60,6 +113,11 @@ class PathModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void removeWaypoint(int i) {
+    waypoints.removeAt(i);
+    notifyListeners();
+  }
+
   void updateWaypoint(int i, Waypoint wp) {
     waypoints[i] = wp;
     notifyListeners();
@@ -70,27 +128,24 @@ class PathModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setReversed(int i, bool reversed) {
+    waypoints[i].reversed = reversed;
+    notifyListeners();
+  }
+
+  void setVelocity(int i, double velocity) {
+    waypoints[i].velocity = velocity;
+    notifyListeners();
+  }
+
+  void setAccel(int i, double accel) {
+    waypoints[i].accel = accel;
+    notifyListeners();
+  }
+
   void clear() {
     waypoints.clear();
     notifyListeners();
-  }
-  final List<VelocityPoint> velocityPoints = [
-    VelocityPoint(t: 0.0, v: 0.0),
-    VelocityPoint(t: 1.0, v: 0.0),
-  ];
-
-  void addVelocityPoint(VelocityPoint point) {
-    velocityPoints.add(point);
-    velocityPoints.sort((a, b) => a.t.compareTo(b.t));
-    notifyListeners();
-  }
-
-  void updateVelocityPoint(int index, VelocityPoint point) {
-    if (index >= 0 && index < velocityPoints.length) {
-      velocityPoints[index] = point;
-      velocityPoints.sort((a, b) => a.t.compareTo(b.t));
-      notifyListeners();
-    }
   }
 }
 
