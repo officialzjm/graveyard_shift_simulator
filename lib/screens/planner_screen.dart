@@ -25,6 +25,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
   Widget build(BuildContext context) {
     final waypoints = context.watch<PathModel>().waypoints;
     final commandList = context.watch<CommandList>();
+    final commands = commandList.commands; // <-- typed list
     return Scaffold(
       body: Column(
         children: [
@@ -171,7 +172,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
                   child: ListView.builder(
                     itemCount: waypoints.length,
                     itemBuilder: (context, index) {
-                      final wpCommands = commandList.commands;
+                      final wpCommands = commands;
                         .where((c) => c.waypointIndex == index)
                         .toList();
                       return WaypointRow(index: index, wpCommands: wpCommands);
