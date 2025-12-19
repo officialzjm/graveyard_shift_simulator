@@ -25,6 +25,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
   Widget build(BuildContext context) {
     final waypoints = context.watch<PathModel>().waypoints;
     final commandList = context.watch<CommandList>();
+    final commands = commandList.commands; // <-- typed list
     return Scaffold(
       body: Column(
         children: [
@@ -162,8 +163,6 @@ class _PlannerScreenState extends State<PlannerScreen> {
                     const Text('Waypoints Manager', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   if(!displayWaypoints)
                     const Text('Commands Manager', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  if(!displayWaypoints)
-                    IconButton(onPressed:() => commandList.addCommand(Command(t: 1.0, name: CommandName.intake)), icon: Icon(Icons.add_circle), iconSize: 30, color: Colors.pink),
                 ],
               ),
               
@@ -172,17 +171,19 @@ class _PlannerScreenState extends State<PlannerScreen> {
                 Expanded(
                   child: ListView.builder(
                     itemCount: waypoints.length,
-                    itemBuilder: (context, index) => WaypointRow(index: index),
-                  ),
-                ),
-              if (!displayWaypoints)
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: commandList.commands.length,
-                    itemBuilder: (context, index) => CommandRow(index: index),
-                  ),
-                ),
+                    itemBuilder: (context, index) {
+                      final wpCommands = <({int globalIndex, Command command})>[];
 
+                      for (int i = 0; i < commands.length; i++) {
+                        if (commands[i].waypointIndex == index) {
+                          wpCommands.add((globalIndex: i, command: commands[i]));
+                        }
+                      }
+
+                      return WaypointRow(index: index, wpCommands: wpCommands);
+                    },
+                  ),
+                ),
               const SizedBox(height: 16),
               /*
               Container(
