@@ -172,22 +172,18 @@ class _PlannerScreenState extends State<PlannerScreen> {
                   child: ListView.builder(
                     itemCount: waypoints.length,
                     itemBuilder: (context, index) {
-                      final wpCommands = commands
-                        .where((c) => c.waypointIndex == index)
-                        .toList();
+                      final wpCommands = <({int globalIndex, Command command})>[];
+
+                      for (int i = 0; i < commands.length; i++) {
+                        if (commands[i].waypointIndex == index) {
+                          wpCommands.add((globalIndex: i, command: commands[i]));
+                        }
+                      }
+
                       return WaypointRow(index: index, wpCommands: wpCommands);
                     },
                   ),
                 ),
-              /*
-              if (!displayWaypoints)
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: commandList.commands.length,
-                    itemBuilder: (context, index) => CommandRow(index: index),
-                  ),
-                ),
-              */
               const SizedBox(height: 16),
               /*
               Container(

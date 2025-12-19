@@ -5,7 +5,7 @@ import 'package:graveyard_shift_simulator/models/path_structure.dart';
 
 class WaypointRow extends StatelessWidget {
   final int index;
-  final List<Command> wpCommands;
+  final List<({int globalIndex, Command command})> wpCommands;
   final value = .5;
   const WaypointRow({super.key, required this.index, required this.wpCommands});
 
@@ -72,8 +72,11 @@ class WaypointRow extends StatelessWidget {
                   ),
                 ],
               ),
-              for (int i = 0; i < wpCommands.length; i++)
-                CommandRow(index: i, command: wpCommands[i]),
+              for (final entry in wpCommands)
+                CommandRow(
+                  globalIndex: entry.globalIndex,
+                  command: entry.command,
+                ),
             ],
           ),
         );
