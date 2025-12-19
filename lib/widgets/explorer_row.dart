@@ -57,7 +57,7 @@ class WaypointRow extends StatelessWidget {
                   ),
                   
                   SizedBox(width: 10),
-                  Expanded(child:Text('Waypoint $index', style: TextStyle(color: Colors.white70))) //expanded not really needed
+                  Expanded(child:Text('Waypoint $index', style: TextStyle(color: Colors.white70))), //expanded not really needed
                   Consumer<CommandList>(
                     builder: (context, commandList, child) {
                       return IconButton(

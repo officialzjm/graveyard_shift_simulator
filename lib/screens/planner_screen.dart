@@ -175,7 +175,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
                         .where((c) => c.waypointIndex == index)
                         .toList();
                       return WaypointRow(index: index, wpCommands: wpCommands);
-                    }.
+                    },
                   ),
                 ),
               /*
