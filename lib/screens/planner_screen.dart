@@ -171,7 +171,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
                   child: ListView.builder(
                     itemCount: waypoints.length,
                     itemBuilder: (context, index) {
-                      final wpCommands = commands
+                      final wpCommands = commandList.commands;
                         .where((c) => c.waypointIndex == index)
                         .toList();
                       return WaypointRow(index: index, wpCommands: wpCommands);
