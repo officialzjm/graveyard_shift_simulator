@@ -268,4 +268,3 @@ class _FieldPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _FieldPainter old) => true;
 }
-
