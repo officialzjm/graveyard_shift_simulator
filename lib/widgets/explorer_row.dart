@@ -58,12 +58,22 @@ class WaypointRow extends StatelessWidget {
                   
                   SizedBox(width: 10),
                   Expanded(child:Text('Waypoint $index', style: TextStyle(color: Colors.white70))) //expanded not really needed
-                  IconButton(onPressed:() => commandList.addCommand(Command(t: 1.0, waypointIndex: index, name: CommandName.intake)), icon: Icon(Icons.add_circle), iconSize: 30, color: Colors.pink),
+                  Consumer<CommandList>(
+                    builder: (context, commandList, child) {
+                      return IconButton(
+                        onPressed: () => commandList.addCommand(
+                          Command(t: 1.0, waypointIndex: index, name: CommandName.intake),
+                        ),
+                        icon: Icon(Icons.add_circle),
+                        iconSize: 30,
+                        color: Colors.pink,
+                      );
+                    },
+                  ),
                 ],
               ),
-              for (int i = 0, i < wpCommands.length; i++) {
-                CommandRow(index: i, command: wpCommands[i])
-              }
+              for (int i = 0; i < wpCommands.length; i++)
+                CommandRow(index: i, command: wpCommands[i]),
             ],
           ),
         );
