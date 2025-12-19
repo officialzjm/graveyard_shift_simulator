@@ -125,7 +125,7 @@ class CommandRow extends StatelessWidget {
                   isExpanded: true,
                   onChanged: (CommandName? newName) {
                     if (newName != null) {
-                      commandList.modifyCommand(index, Command(t: command.t, name: newName));
+                      commandList.modifyCommand(index, Command(t: command.t, waypointIndex: i, name: newName));
                     }
                   },
                   items: CommandName.values.map((cmd) {
