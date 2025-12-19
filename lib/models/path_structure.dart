@@ -26,10 +26,12 @@ class Waypoint {
 
 class Command {
   double t;
+  int waypointIndex;
   CommandName name;
 
   Command({
     this.t = 0,
+    required this.waypointIndex;;
     this.name = CommandName.intake,
   });
 

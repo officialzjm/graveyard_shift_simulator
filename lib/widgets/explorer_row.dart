@@ -5,8 +5,9 @@ import 'package:graveyard_shift_simulator/models/path_structure.dart';
 
 class WaypointRow extends StatelessWidget {
   final int index;
+  final List<Command> wpCommands;
   final value = .5;
-  const WaypointRow({super.key, required this.index});
+  const WaypointRow({super.key, required this.index, required this.wpCommands});
 
   @override
   Widget build(BuildContext context) {
@@ -16,45 +17,53 @@ class WaypointRow extends StatelessWidget {
         
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 6),
-          child: Row(
+          child: Column(
             children: [
-              IconButton(
-                onPressed: () => pathModel.setVisibility(index, !waypoint.visible),
-                icon: Icon(
-                  waypoint.visible
-                      ? Icons.remove_red_eye
-                      : Icons.remove_red_eye_outlined,
-                ),
-                color: Colors.lightBlueAccent,
-                iconSize: 28,
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: () => pathModel.setVisibility(index, !waypoint.visible),
+                    icon: Icon(
+                      waypoint.visible
+                          ? Icons.remove_red_eye
+                          : Icons.remove_red_eye_outlined,
+                    ),
+                    color: Colors.lightBlueAccent,
+                    iconSize: 28,
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.delete),
+                    color: Colors.redAccent,
+                    onPressed:() => pathModel.removeWaypoint(index),
+                    iconSize: 28,
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      waypoint.reversed 
+                        ? Icons.arrow_back 
+                        : Icons.arrow_forward
+                    ),
+                    color: Colors.purpleAccent,
+                    onPressed: () => pathModel.setReversed(index,!waypoint.reversed),
+                    iconSize: 28,
+                  ),
+                  Expanded(
+                    child: Slider(
+                      value: waypoint.velocity,
+                      onChanged: (v) => pathModel.setVelocity(index,v),
+                      min: 0,
+                      max: maxVelocity,
+                    ),
+                  ),
+                  
+                  SizedBox(width: 10),
+                  Expanded(child:Text('Waypoint $index', style: TextStyle(color: Colors.white70))) //expanded not really needed
+                  IconButton(onPressed:() => commandList.addCommand(Command(t: 1.0, waypointIndex: index, name: CommandName.intake)), icon: Icon(Icons.add_circle), iconSize: 30, color: Colors.pink),
+                ],
               ),
-              IconButton(
-                icon: Icon(Icons.delete),
-                color: Colors.redAccent,
-                onPressed:() => pathModel.removeWaypoint(index),
-                iconSize: 28,
-              ),
-              IconButton(
-                icon: Icon(
-                  waypoint.reversed 
-                    ? Icons.arrow_back 
-                    : Icons.arrow_forward
-                ),
-                color: Colors.purpleAccent,
-                onPressed: () => pathModel.setReversed(index,!waypoint.reversed),
-                iconSize: 28,
-              ),
-              Expanded(
-                child: Slider(
-                  value: waypoint.velocity,
-                  onChanged: (v) => pathModel.setVelocity(index,v),
-                  min: 0,
-                  max: maxVelocity,
-                ),
-              ),
-              
-              SizedBox(width: 10),
-              Expanded(child:Text('Waypoint $index', style: TextStyle(color: Colors.white70))) //expanded not really needed
+              for (int i = 0, i < wpCommands.length; i++) {
+                CommandRow(index: i, command: wpCommands[i])
+              }
             ],
           ),
         );
@@ -64,18 +73,17 @@ class WaypointRow extends StatelessWidget {
 }
 class CommandRow extends StatelessWidget {
   final int index;
-  const CommandRow({super.key, required this.index});
+  final Command command;
+  const CommandRow({super.key, required this.index, required this.command});
 
   @override
   Widget build(BuildContext context) {
     return Consumer<CommandList>(
       builder: (context, commandList, child) {
-        final command = commandList.commands[index];
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 6),
           child: Row(
-            children: [
-              
+            children: [ 
               Expanded(
                 flex: 1,
                 child: Text('$index', style: TextStyle(color: Colors.white70)),

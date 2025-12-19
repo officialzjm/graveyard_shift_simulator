@@ -39,7 +39,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const Spacer(),
-                /*
+                
                 IconButton(
                   icon: const Icon(Icons.download),
                   onPressed: () {
@@ -48,7 +48,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
                     downloadJsonWeb(jsonPath, 'Path1');
                   },
                 ),
-                */
+                
               ],
             ),
           ),
@@ -162,8 +162,6 @@ class _PlannerScreenState extends State<PlannerScreen> {
                     const Text('Waypoints Manager', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   if(!displayWaypoints)
                     const Text('Commands Manager', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  if(!displayWaypoints)
-                    IconButton(onPressed:() => commandList.addCommand(Command(t: 1.0, name: CommandName.intake)), icon: Icon(Icons.add_circle), iconSize: 30, color: Colors.pink),
                 ],
               ),
               
@@ -172,7 +170,12 @@ class _PlannerScreenState extends State<PlannerScreen> {
                 Expanded(
                   child: ListView.builder(
                     itemCount: waypoints.length,
-                    itemBuilder: (context, index) => WaypointRow(index: index),
+                    itemBuilder: (context, index) {
+                      final wpCommands = commands
+                        .where((c) => c.waypointIndex == index)
+                        .toList();
+                      return WaypointRow(index: index, commands: wpCommands),
+                    }.
                   ),
                 ),
               if (!displayWaypoints)
