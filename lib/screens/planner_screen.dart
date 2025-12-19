@@ -174,10 +174,11 @@ class _PlannerScreenState extends State<PlannerScreen> {
                       final wpCommands = commands
                         .where((c) => c.waypointIndex == index)
                         .toList();
-                      return WaypointRow(index: index, commands: wpCommands),
+                      return WaypointRow(index: index, wpCommands: wpCommands);
                     }.
                   ),
                 ),
+              /*
               if (!displayWaypoints)
                 Expanded(
                   child: ListView.builder(
@@ -185,7 +186,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
                     itemBuilder: (context, index) => CommandRow(index: index),
                   ),
                 ),
-
+              */
               const SizedBox(height: 16),
               /*
               Container(

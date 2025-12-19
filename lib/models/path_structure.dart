@@ -31,7 +31,7 @@ class Command {
 
   Command({
     this.t = 0,
-    required this.waypointIndex;;
+    required this.waypointIndex,
     this.name = CommandName.intake,
   });
 
