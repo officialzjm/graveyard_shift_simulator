@@ -39,7 +39,7 @@ class _FieldViewState extends State<FieldView> {
     final scaleX = size.width / (fieldHalf * 2);
     final scaleY = size.height / (fieldHalf * 2);
     final dynamicScale = min(scaleX, scaleY);
-    return center + logical * dynamicScale;
+    return Offset(center.dx + (logical.dx * dynamicScale), center.dy - (logical.dy * dynamicScale));
   }
 
   Offset toLogical(Offset screen, Size size) {
@@ -47,7 +47,7 @@ class _FieldViewState extends State<FieldView> {
     final scaleX = size.width / (fieldHalf * 2);
     final scaleY = size.height / (fieldHalf * 2);
     final dynamicScale = min(scaleX, scaleY);
-    return (screen - center) / dynamicScale;
+    return Offset((screen.dx - center.dx)/dynamicScale,(center.dy - screen.dy)/dynamicScale);
   }
 
   DragTargetInfo? _hitTest(Offset logical) {
@@ -75,7 +75,9 @@ class _FieldViewState extends State<FieldView> {
   @override
   Widget build(BuildContext context) {
       final pathModel = context.read<PathModel>();
-      final waypoints = pathModel.waypoints;    return LayoutBuilder(builder: (context, constraints) {
+      final commands = context.read<CommandList>().commands;
+      final waypoints = pathModel.waypoints;
+      return LayoutBuilder(builder: (context, constraints) {
       final size = constraints.biggest;
 
       return GestureDetector(
@@ -137,6 +139,7 @@ class _FieldViewState extends State<FieldView> {
           painter: _FieldPainter(
             toScreen: (o) => toScreen(o, size),
             waypoints: waypoints,
+            commands: commands,
             fieldImage: fieldImage,
             tValue: widget.tValue,
           ),
@@ -149,12 +152,14 @@ class _FieldViewState extends State<FieldView> {
 class _FieldPainter extends CustomPainter {
   final ui.Image? fieldImage;
   final List<Waypoint> waypoints;
+  final List<Command> commands;
   final Offset Function(Offset) toScreen; 
   final double tValue;
 
   _FieldPainter({
     this.fieldImage,
     required this.waypoints,
+    required this.commands,
     required this.toScreen,
     required this.tValue,
   });
@@ -193,6 +198,12 @@ class _FieldPainter extends CustomPainter {
       ..color = Colors.orangeAccent
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5 / dynamicScale;
+
+    final commandPaint = Paint()
+      ..color = Colors.red
+      ..style = PaintingStyle.fill
+      ..strokeWidth = 1 / dynamicScale;
+
 
     final drawingRadius = handleRadius * dynamicScale; // 2 inches scaled
 
@@ -248,8 +259,13 @@ class _FieldPainter extends CustomPainter {
         canvas.drawCircle(waypoint2pos, drawingRadius, paintHandle);
       }
     }
+    for (int i = 0; i < commands.length; i++) {
+      Offset? cmdPos = positionAtTauNormalizedByDistance(waypoints, commands[i].t);
+      canvas.drawCircle(toScreen(cmdPos!), drawingRadius, commandPaint);
+    }
   }
 
   @override
   bool shouldRepaint(covariant _FieldPainter old) => true;
 }
+

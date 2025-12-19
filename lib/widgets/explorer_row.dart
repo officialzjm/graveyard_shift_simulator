@@ -38,7 +38,7 @@ class WaypointRow extends StatelessWidget {
                 icon: Icon(
                   waypoint.reversed 
                     ? Icons.arrow_back 
-                    : Icons.arrow_back
+                    : Icons.arrow_forward
                 ),
                 color: Colors.purpleAccent,
                 onPressed: () => pathModel.setReversed(index,!waypoint.reversed),
@@ -107,7 +107,7 @@ class CommandRow extends StatelessWidget {
                   isExpanded: true,
                   onChanged: (CommandName? newName) {
                     if (newName != null) {
-                      commandList.modifyCommand(index, Command(t: command.t, name: newName, type: command.type));
+                      commandList.modifyCommand(index, Command(t: command.t, name: newName));
                     }
                   },
                   items: CommandName.values.map((cmd) {
@@ -119,24 +119,6 @@ class CommandRow extends StatelessWidget {
                 ),
               ),
               SizedBox(width: 10),
-              Expanded(
-                flex: 12,
-                child: DropdownButton<CommandType>(
-                  value: command.type,
-                  isExpanded: true,
-                  onChanged: (CommandType? newType) {
-                    if (newType != null) {
-                      commandList.modifyCommand(index, Command(t: command.t, name: command.name, type: newType));
-                    }
-                  },
-                  items: CommandType.values.map((cmd) {
-                    return DropdownMenuItem<CommandType>(
-                      value: cmd,
-                      child: Text(cmd.name),
-                    );
-                  }).toList(),
-                ),
-              ),
               Flexible(
                 child: SizedBox(width: 100),
               ),

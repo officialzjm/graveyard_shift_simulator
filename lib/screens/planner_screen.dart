@@ -39,6 +39,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const Spacer(),
+                /*
                 IconButton(
                   icon: const Icon(Icons.download),
                   onPressed: () {
@@ -47,38 +48,79 @@ class _PlannerScreenState extends State<PlannerScreen> {
                     downloadJsonWeb(jsonPath, 'Path1');
                   },
                 ),
-                /*
-                const Spacer(),
-                IconButton(
-                  icon: const Icon(Icons.folder_open),
-                  onPressed: () {},
-                ),
-                IconButton(
-                  icon: const Icon(Icons.save),
-                  onPressed: () {},
-                ),
                 */
               ],
             ),
           ),
           Expanded( // Outer Expanded for field+sidebar
   child: Row(
+    
     children: [
+      const SizedBox(width: 12), // 👈 THIS is the missing piece
       // Field - fixed
-      ConstrainedBox(
-        constraints: const BoxConstraints(
-          minWidth: 500,
-          minHeight: 500,
-          maxHeight: 900,
-          maxWidth: 900,
+      Expanded(child:
+      Column(
+        children:[ 
+        ConstrainedBox(
+          constraints: const BoxConstraints(
+            minWidth: 200, //500x900
+            minHeight: 200,
+            maxHeight: 550,
+            maxWidth: 550,
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            color: Colors.black,
+            child: FieldView(tValue: tValue),
+          ),
         ),
-        child: Container(
-          padding: const EdgeInsets.all(12),
-          color: Colors.black,
-          child: FieldView(tValue: tValue),
-        ),
-      ),
-      
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade700,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Text('Robot Path Visualizer', style: TextStyle(fontWeight: FontWeight.bold)),
+                    const Spacer(),
+                    ElevatedButton(
+                      onPressed: () => setState(() => tValue = 0.0),
+                      child: const Text('Reset t'),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () => setState(() => tValue = 1.0),
+                      child: const Text('End t'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    const Text('t = '),
+                    Expanded(
+                      child: Slider(
+                        value: tValue,
+                        onChanged: (v) => setState(() => tValue = v),
+                        min: 0,
+                        max: 1,
+                      ),
+                    ),
+                    Text(tValue.toStringAsFixed(2)),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        )],
+      ),),
+      const SizedBox(width: 12),
       Expanded( 
         child: Container(
           color: Colors.grey.shade800,
@@ -120,7 +162,8 @@ class _PlannerScreenState extends State<PlannerScreen> {
                     const Text('Waypoints Manager', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   if(!displayWaypoints)
                     const Text('Commands Manager', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                    IconButton(onPressed:() => commandList.addCommand(Command(t: 1.0, name: CommandName.intake, type: CommandType.enable)), icon: Icon(Icons.add_circle), iconSize: 30, color: Colors.pink),
+                  if(!displayWaypoints)
+                    IconButton(onPressed:() => commandList.addCommand(Command(t: 1.0, name: CommandName.intake)), icon: Icon(Icons.add_circle), iconSize: 30, color: Colors.pink),
                 ],
               ),
               
@@ -141,7 +184,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
                 ),
 
               const SizedBox(height: 16),
-              
+              /*
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
@@ -152,7 +195,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('Robot Path Visualizer (t)', style: TextStyle(fontWeight: FontWeight.bold)),
+                    const Text('Robot Path Visualizer', style: TextStyle(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 8),
                     Row(
                       children: [
@@ -185,7 +228,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
                   ],
                 ),
               ),
-              
+              */
               const SizedBox(height: 8),
 
             ],

@@ -27,12 +27,10 @@ class Waypoint {
 class Command {
   double t;
   CommandName name;
-  CommandType? type;
 
   Command({
     this.t = 0,
     this.name = CommandName.intake,
-    required this.type,
   });
 
   Map<String, dynamic> toJson() => {'t': t.toPrecision(4), 'name': name.name};
@@ -43,8 +41,8 @@ extension DoublePrecision on double {
 
 extension OffsetJson on Offset {
   Map<String, double> toJson() => {
-    'x': dx.toPrecision(4),
-    'y': dy.toPrecision(4),
+    'x': (dx*0.0254).toPrecision(4),
+    'y': (dy*0.0254).toPrecision(4),
   };
 }
 
@@ -97,7 +95,6 @@ class CommandList extends ChangeNotifier {
 
 enum SegmentDragType { pos, handleIn, handleOut }
 enum CommandName {intake, longgoal, uppercentergoal, matchloader}
-enum CommandType {enable, disable}
 
 class DragTargetInfo {
   final SegmentDragType type;
