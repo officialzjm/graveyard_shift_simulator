@@ -113,7 +113,9 @@ class CommandList extends ChangeNotifier {
   }
 
   void setCommands(List<Command> cmds) {
-    commands = cmds;
+    commands
+      ..clear()
+      ..addAll(cmds);
     notifyListeners();
   }
 }
