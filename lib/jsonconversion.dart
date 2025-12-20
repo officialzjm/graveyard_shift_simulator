@@ -59,7 +59,7 @@ List<Segment> createSegmentList(List<Waypoint> waypoints) {
     } else {
       path = [wp.pos,nextWp.pos];
     }
-    segments.add(Segment(inverted: wp.reversed, stopEnd: false, path: path, velocity: (wp.velocity*0.0254).toPrecision(4), accel: wp.accel.toPrecision(4)));
+    segments.add(Segment(inverted: wp.reversed, stopEnd: false, path: path, velocity: (wp.velocity*0.0254).toPrecision(4), accel: (wp.accel*0.0254).toPrecision(4)));
   }
   return segments;
 }
