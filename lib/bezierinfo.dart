@@ -169,5 +169,5 @@ LocalCommandT globalTToLocalCommandT({
       segmentLength == 0
           ? 0.0
           : (targetDistance - segmentStart) / segmentLength;
-  return LocalCommandT(index, localSegmentT.clamp(0.0,1.0));
+  return LocalCommandT(segmentIndex, localSegmentT.clamp(0.0,1.0));
 }
