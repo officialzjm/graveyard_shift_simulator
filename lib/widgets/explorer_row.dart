@@ -76,7 +76,7 @@ class WaypointRow extends StatelessWidget {
                 CommandRow(
                   globalIndex: entry.globalIndex,
                   command: entry.command,
-                ),
+              ),
             ],
           ),
         );
@@ -85,9 +85,14 @@ class WaypointRow extends StatelessWidget {
   }
 }
 class CommandRow extends StatelessWidget {
-  final int index;
+  final int globalIndex;
   final Command command;
-  const CommandRow({super.key, required this.index, required this.command});
+
+  const CommandRow({
+    super.key,
+    required this.globalIndex,
+    required this.command,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -96,52 +101,60 @@ class CommandRow extends StatelessWidget {
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 6),
           child: Row(
-            children: [ 
-              Expanded(
-                flex: 1,
-                child: Text('$index', style: TextStyle(color: Colors.white70)),
-              ), //expanded not really needed
+            children: [
               Expanded(
                 flex: 2,
                 child: IconButton(
                   icon: Icon(Icons.delete),
                   color: Colors.redAccent,
-                  onPressed:() => commandList.removeCommand(index),
+                  onPressed: () =>
+                      commandList.removeCommand(globalIndex),
                 ),
               ),
-              SizedBox(width: 10),
-              //x2
+              const SizedBox(width: 10),
               Expanded(
                 flex: 8,
                 child: TextField(
-                  decoration: InputDecoration(labelText: 'Distance along the path', hintText: '0 < tau < 1'),
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  decoration: const InputDecoration(
+                    labelText: 'Distance along the path',
+                    hintText: '0 < tau < 1',
+                  ),
+                  keyboardType:
+                      TextInputType.numberWithOptions(decimal: true),
                   maxLength: 7,
-                  onChanged: (v) => commandList.changeCmdT(index, double.parse(v)),
+                  onChanged: (v) {
+                    final t = double.tryParse(v);
+                    if (t != null) {
+                      commandList.changeCmdT(globalIndex, t);
+                    }
+                  },
                 ),
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               Expanded(
                 flex: 20,
                 child: DropdownButton<CommandName>(
                   value: command.name,
                   isExpanded: true,
-                  onChanged: (CommandName? newName) {
+                  onChanged: (newName) {
                     if (newName != null) {
-                      commandList.modifyCommand(index, Command(t: command.t, waypointIndex: index, name: newName));
+                      commandList.modifyCommand(
+                        globalIndex,
+                        Command(
+                          t: command.t,
+                          waypointIndex: command.waypointIndex,
+                          name: newName,
+                        ),
+                      );
                     }
                   },
                   items: CommandName.values.map((cmd) {
-                    return DropdownMenuItem<CommandName>(
+                    return DropdownMenuItem(
                       value: cmd,
                       child: Text(cmd.name),
                     );
                   }).toList(),
                 ),
-              ),
-              SizedBox(width: 10),
-              Flexible(
-                child: SizedBox(width: 100),
               ),
             ],
           ),

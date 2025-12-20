@@ -260,8 +260,11 @@ class _FieldPainter extends CustomPainter {
       }
     }
     for (int i = 0; i < commands.length; i++) {
-      Offset? cmdPos = positionAtTauNormalizedByDistance(waypoints, commands[i].t);
-      canvas.drawCircle(toScreen(cmdPos!), drawingRadius, commandPaint);
+      int waypointIndex = commands[i].waypointIndex;
+      if (waypointIndex < waypoints.length - 1) {
+        Offset? cmdPos = positionAtTauNormalizedByDistance(<Waypoint>[waypoints[waypointIndex],waypoints[waypointIndex+1]], commands[i].t);
+        canvas.drawCircle(toScreen(cmdPos!), drawingRadius, commandPaint);
+      }
     }
   }
 

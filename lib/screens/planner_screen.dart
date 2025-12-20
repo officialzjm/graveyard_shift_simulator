@@ -44,8 +44,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
                 IconButton(
                   icon: const Icon(Icons.download),
                   onPressed: () {
-                    List<Segment> segments = createSegmentList(waypoints);
-                    String jsonPath = createPathJson(segments: segments, commands: commandList.commands);
+                    String jsonPath = createPathJson(waypoints, commandList.commands);
                     downloadJsonWeb(jsonPath, 'Path1');
                   },
                 ),

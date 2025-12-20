@@ -34,13 +34,13 @@ Color velocityToColor(double v) {
   return Color.lerp(Colors.red, Colors.green, t)!;
 }
 
-double cubicBezierLength(
-  Offset p0,
-  Offset p1,
-  Offset p2,
-  Offset p3, {
-  int samples = 50,
-}) {
+double segmentLength(Waypoint a, Waypoint b, {int samples = 50}) {
+  final p0 = a.pos;
+  final p1 = a.handleOut ?? p0;
+  final p2 = b.handleIn ?? b.pos;
+  final p3 = b.pos;
+
+  
   double length = 0.0;
   Offset prev = p0;
 
@@ -54,11 +54,23 @@ double cubicBezierLength(
   return length;
 }
 
-Offset? positionAtTauNormalizedByDistance(
-  List<Waypoint> waypoints,
-  double tau, {
-  int samplesPerSegment = 50,
-}) {
+List<double> computeSegmentLengths(List<Waypoint> waypoints) {
+  final lengths = <double>[];
+  for (int i = 0; i < waypoints.length - 1; i++) {
+    lengths.add(segmentLength(waypoints[i], waypoints[i+1]));
+  }
+  return lengths;
+}
+List<double> cumulativeDistances(List<double> lengths) {
+  final cum = <double>[0.0];
+  for (final l in lengths) {
+    cum.add(cum.last + l);
+  }
+  return cum;
+}
+int samplesPerSegment = 50;
+
+Offset? positionAtTauNormalizedByDistance(List<Waypoint> waypoints, double tau) {
   if (waypoints.length < 2) return null;
 
   // Clamp tau
@@ -71,23 +83,10 @@ Offset? positionAtTauNormalizedByDistance(
   for (int i = 0; i < waypoints.length - 1; i++) {
     final w0 = waypoints[i];
     final w1 = waypoints[i + 1];
+    final length = segmentLength(w0, w1);
 
-    // If no handles, treat as straight line
-    final p0 = w0.pos;
-    final p3 = w1.pos;
-    final p1 = w0.handleOut ?? p0;
-    final p2 = w1.handleIn ?? p3;
-
-    final len = cubicBezierLength(
-      p0,
-      p1,
-      p2,
-      p3,
-      samples: samplesPerSegment,
-    );
-
-    segmentLengths.add(len);
-    totalLength += len;
+    segmentLengths.add(length);
+    totalLength += length;
   }
 
   if (totalLength <= 0) return waypoints.first.pos;
@@ -135,4 +134,20 @@ Offset? positionAtTauNormalizedByDistance(
   }
 
   return waypoints.last.pos;
+}
+
+double commandToGlobalT({
+  required Command cmd,
+  required List<Waypoint> waypoints,
+  required List<double> segmentLengths,
+  required List<double> cumulative,
+}) {
+  final segIndex = cmd.waypointIndex;
+  if (segIndex < 0 || segIndex >= segmentLengths.length) return 0.0;
+
+  final localDist = cmd.t * segmentLengths[segIndex];
+  final globalDist = cumulative[segIndex] + localDist;
+  final totalDist = cumulative.last;
+
+  return (totalDist == 0) ? 0.0 : globalDist / totalDist;
 }
