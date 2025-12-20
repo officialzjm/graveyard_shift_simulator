@@ -72,11 +72,9 @@ int samplesPerSegment = 50;
 
 Offset? positionAtTauNormalizedByDistance(List<Waypoint> waypoints, double tau) {
   if (waypoints.length < 2) return null;
-
-  // Clamp tau
+  
   tau = tau.clamp(0.0, 1.0);
-
-  // ---- Step 1: compute lengths per segment ----
+  
   final segmentLengths = <double>[];
   double totalLength = 0.0;
 
@@ -91,15 +89,13 @@ Offset? positionAtTauNormalizedByDistance(List<Waypoint> waypoints, double tau) 
 
   if (totalLength <= 0) return waypoints.first.pos;
 
-  // ---- Step 2: target distance along path ----
   double targetDist = tau * totalLength;
 
-  // ---- Step 3: find the segment ----
+
   for (int i = 0; i < segmentLengths.length; i++) {
     final segLen = segmentLengths[i];
 
     if (targetDist <= segLen) {
-      // ---- Step 4: convert distance → local t ----
       final w0 = waypoints[i];
       final w1 = waypoints[i + 1];
 
@@ -108,7 +104,6 @@ Offset? positionAtTauNormalizedByDistance(List<Waypoint> waypoints, double tau) 
       final p1 = w0.handleOut ?? p0;
       final p2 = w1.handleIn ?? p3;
 
-      // Walk along this segment until we reach targetDist
       double walked = 0.0;
       Offset prev = p0;
 
@@ -122,24 +117,21 @@ Offset? positionAtTauNormalizedByDistance(List<Waypoint> waypoints, double tau) 
           final ratio = remaining / d;
           return Offset.lerp(prev, curr, ratio)!;
         }
-
+        
         walked += d;
         prev = curr;
       }
-
       return p3;
     }
-
     targetDist -= segLen;
   }
-
   return waypoints.last.pos;
 }
 
 double commandToGlobalT({
   required Command cmd,
   required List<Waypoint> waypoints,
-  required List<double> segmentLengths,
+  required List<double> segmentLengths,//change to calculate in the function
   required List<double> cumulative,
 }) {
   final segIndex = cmd.waypointIndex;
@@ -150,4 +142,32 @@ double commandToGlobalT({
   final totalDist = cumulative.last;
 
   return (totalDist == 0) ? 0.0 : globalDist / totalDist;
+}
+double globalTToLocalCommandT({
+  required double globalT,
+  required List<Waypoint> waypoints,
+}) {
+  final segmentLengths = computeSegmentLengths(waypoints);
+  final cumulative = cumulativeDistances(segmentLengths);
+
+  final totalLength = cumulative.last;
+  final targetDistance = globalT * totalLength;
+
+  int segmentIndex = 0;
+  for (int i = 0; i < cumulative.length - 1; i++) {
+    if (targetDistance >= cumulative[i] &&
+        targetDistance <= cumulative[i + 1]) {
+      segmentIndex = i;
+      break;
+    }
+  }
+
+  final segmentStart = cumulative[segmentIndex];
+  final segmentLength = segmentLengths[segmentIndex];
+
+  final localSegmentT =
+      segmentLength == 0
+          ? 0.0
+          : (targetDistance - segmentStart) / segmentLength;
+  return localSegmentT.clamp(0.0,1.0);
 }
