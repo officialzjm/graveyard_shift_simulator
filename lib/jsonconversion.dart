@@ -70,11 +70,77 @@ List<Command> importCommands(
 ) {
   return jsonCommands.map((c) {
     final globalT = (c['t'] as num).toDouble();
-    final localCmdT = globalTToLocalCommandT(globalT: globalT, waypoints: waypoints)
+    final localCmdT = globalTToLocalCommandT(globalT: globalT, waypoints: waypoints);
     return Command(
       name: commandNameFromString(c['name']),
-      tau: localCmdT.localT,
+      t: localCmdT.localT,
       waypointIndex: localCmdT.waypointIndex,
     );
   }).toList();
+}
+List<Waypoint> importWaypoints(List<dynamic> jsonSegments) {
+  final List<Waypoint> waypoints = [];
+
+  for (int i = 0; i < jsonSegments.length; i++) {
+    final seg = jsonSegments[i];
+    final path = seg['path'] as List;
+    final inverted = seg['inverted'] as bool;
+    final constraints = seg['constraints'];
+
+    final velocity = (constraints['velocity'] as num).toDouble() / 0.0254;
+    final accel = (constraints['accel'] as num).toDouble() / 0.0254;
+
+    final start = Offset(
+      (path.first['x'] as num).toDouble(),
+      (path.first['y'] as num).toDouble(),
+    );
+
+    final end = Offset(
+      (path.last['x'] as num).toDouble(),
+      (path.last['y'] as num).toDouble(),
+    );
+
+    final isBezier = path.length == 4;
+
+    Offset? handleOut;
+    Offset? handleIn;
+
+    if (isBezier) {
+      handleOut = Offset(
+        (path[1]['x'] as num).toDouble(),
+        (path[1]['y'] as num).toDouble(),
+      );
+      handleIn = Offset(
+        (path[2]['x'] as num).toDouble(),
+        (path[2]['y'] as num).toDouble(),
+      );
+    }
+
+    if (i == 0) {
+      waypoints.add(
+        Waypoint(
+          pos: start,
+          velocity: velocity,
+          accel: accel,
+          reversed: inverted,
+        ),
+      );
+    }
+
+    if (isBezier) {
+      waypoints.last.handleOut = handleOut;
+    }
+
+    waypoints.add(
+      Waypoint(
+        pos: end,
+        handleIn: handleIn,
+        velocity: velocity,
+        accel: accel,
+        reversed: inverted,
+      ),
+    );
+  }
+
+  return waypoints;
 }
