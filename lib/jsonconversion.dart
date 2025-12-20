@@ -33,7 +33,7 @@ String createPathJson(List<Waypoint> waypoints, List<Command> commands, [double 
     );
 
     return {
-      "t": globalTau,
+      "t": globalTau.toPrecision(4),
       "name": cmd.name.name,
     };
   }).toList();
