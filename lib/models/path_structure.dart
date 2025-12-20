@@ -38,6 +38,14 @@ class Command {
   Map<String, dynamic> toJson() => {'t': t.toPrecision(4), 'name': name.name};
 }
 
+class LocalCommandT {
+  final int waypointIndex;
+  final double localT;
+
+  LocalCommandT(this.waypointIndex, this.localT);
+}
+
+
 CommandName commandNameFromString(String s) {
   return CommandName.values.firstWhere(
     (e) => e.name == s,
