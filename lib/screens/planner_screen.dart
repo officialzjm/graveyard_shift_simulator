@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:html' as html;
 import 'package:graveyard_shift_simulator/models/path_structure.dart';
 import 'package:graveyard_shift_simulator/widgets/explorer_row.dart';
 import 'package:graveyard_shift_simulator/widgets/field.dart';
