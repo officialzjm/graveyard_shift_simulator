@@ -144,3 +144,38 @@ List<Waypoint> importWaypoints(List<dynamic> jsonSegments) {
 
   return waypoints;
 }
+
+class PathImportResult {
+  final List<Waypoint> waypoints;
+  final List<Command> commands;
+  final double startSpeed;
+  final double endSpeed;
+
+  PathImportResult({
+    required this.waypoints,
+    required this.commands,
+    required this.startSpeed,
+    required this.endSpeed,
+  });
+}
+
+PathImportResult importPathJson(String jsonString) {
+  final decoded = jsonDecode(jsonString) as Map<String, dynamic>;
+
+  final segments = decoded['segments'] as List;
+  final waypoints = importWaypoints(segments);
+
+  final commands = importCommands(
+    decoded['commands'] as List,
+    waypoints,
+  );
+
+  return PathImportResult(
+    waypoints: waypoints,
+    commands: commands,
+    startSpeed: (decoded['start_speed'] as num).toDouble(),
+    endSpeed: (decoded['end_speed'] as num).toDouble(),
+  );
+}
+
+
