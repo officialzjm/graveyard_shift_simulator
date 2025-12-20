@@ -37,6 +37,15 @@ class Command {
 
   Map<String, dynamic> toJson() => {'t': t.toPrecision(4), 'name': name.name};
 }
+
+CommandName commandNameFromString(String s) {
+  return CommandName.values.firstWhere(
+    (e) => e.name == s,
+    orElse: () => throw ArgumentError('Unknown command name: $s'),
+  );
+}
+
+
 extension DoublePrecision on double {
   double toPrecision(int n) => double.parse(toStringAsFixed(n));
 }
