@@ -2,6 +2,7 @@ import 'package:graveyard_shift_simulator/constants.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
 //later add start and end speed to path model class
+//also move commands into pathmodel
 class Waypoint {
   Offset pos;
   Offset? handleIn;
@@ -122,7 +123,9 @@ class DragTargetInfo {
 }
 
 class PathModel extends ChangeNotifier {
-  final List<Waypoint> waypoints = [];
+  List<Waypoint> waypoints = [];
+  double startSpeed = 0.0;
+  double endSpeed = 0.0;
 
   void addWaypoint(Waypoint wp) {
     waypoints.add(wp);
@@ -163,8 +166,27 @@ class PathModel extends ChangeNotifier {
     waypoints.clear();
     notifyListeners();
   }
-}
 
+  void setPath(PathImportResult result) {
+    waypoints = result.waypoints;
+    startSpeed = result.startSpeed;
+    endSpeed = result.endSpeed;
+    notifyListeners();
+  }
+}
+class PathImportResult {
+  final List<Waypoint> waypoints;
+  final List<Command> commands;
+  final double startSpeed;
+  final double endSpeed;
+
+  PathImportResult({
+    required this.waypoints,
+    required this.commands,
+    required this.startSpeed,
+    required this.endSpeed,
+  });
+}
 double distanceFormula(Offset prevPos, Offset pos) {
   final dist = sqrt(pow((pos.dy-prevPos.dy),2) + pow((pos.dx-prevPos.dx),2));
   return dist;
