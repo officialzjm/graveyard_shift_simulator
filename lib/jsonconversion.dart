@@ -63,3 +63,18 @@ List<Segment> createSegmentList(List<Waypoint> waypoints) {
   }
   return segments;
 }
+
+List<Command> importCommands(
+  List<dynamic> jsonCommands,
+  List<Waypoint> waypoints,
+) {
+  return jsonCommands.map((c) {
+    final globalT = (c['t'] as num).toDouble();
+    final localCmdT = globalTToLocalCommandT(globalT: globalT, waypoints: waypoints)
+    return Command(
+      name: commandNameFromString(c['name']),
+      tau: localCmdT.localT,
+      waypointIndex: localCmdT.waypointIndex,
+    );
+  }).toList();
+}
