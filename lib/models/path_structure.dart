@@ -1,7 +1,7 @@
 import 'package:graveyard_shift_simulator/constants.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
-
+//later add start and end speed to path model class
 class Waypoint {
   Offset pos;
   Offset? handleIn;
