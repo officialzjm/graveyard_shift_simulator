@@ -143,7 +143,7 @@ double commandToGlobalT({
 
   return (totalDist == 0) ? 0.0 : globalDist / totalDist;
 }
-double globalTToLocalCommandT({
+LocalCommandT globalTToLocalCommandT({
   required double globalT,
   required List<Waypoint> waypoints,
 }) {
@@ -169,5 +169,5 @@ double globalTToLocalCommandT({
       segmentLength == 0
           ? 0.0
           : (targetDistance - segmentStart) / segmentLength;
-  return localSegmentT.clamp(0.0,1.0);
+  return LocalCommandT(index, localSegmentT.clamp(0.0,1.0));
 }
