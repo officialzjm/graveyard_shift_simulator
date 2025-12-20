@@ -67,7 +67,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
                           final result = importPathJson(jsonString);
 
                           context.read<PathModel>().setPath(result); //not optimal to place it here so i will move it later
-                          contest.read<CommandList>().setCommands(result.commands);
+                          context.read<CommandList>().setCommands(result.commands);
                           //commandList.setCommands(result.commands);
                         } catch (err) {
                           ScaffoldMessenger.of(context).showSnackBar(
