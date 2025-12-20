@@ -111,6 +111,11 @@ class CommandList extends ChangeNotifier {
     commands[i] = cmd;
     notifyListeners();
   }
+
+  void setCommands(List<Command> cmds) {
+    commands = cmds;
+    notifyListeners();
+  }
 }
 
 enum SegmentDragType { pos, handleIn, handleOut }
