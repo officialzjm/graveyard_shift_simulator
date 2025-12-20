@@ -48,7 +48,36 @@ class _PlannerScreenState extends State<PlannerScreen> {
                     downloadJsonWeb(jsonPath, 'Path1');
                   },
                 ),
-                
+                IconButton(
+                  icon: Icon(Icons.upload_file),
+                  onPressed: () async {
+                    final input = html.FileUploadInputElement();
+                    input.accept = '.json';
+                    input.click();
+
+                    input.onChange.listen((event) {
+                      final file = input.files?.first;
+                      if (file == null) return;
+                      final reader = html.FileReader();
+
+                      reader.onLoadEnd.listen((e) {
+                        final jsonString = reader.result as String;
+                        try {
+                          final result = importPathJson(jsonString);
+
+                          context.read<PathModel>().setPath(result);
+                        } catch (err) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("Failed to load path: $err"),
+                            ),
+                          );
+                        }
+                     });
+                     reader.readAsText(file);
+                   });
+                  },
+                )
               ],
             ),
           ),
