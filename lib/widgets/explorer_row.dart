@@ -55,6 +55,14 @@ class WaypointRow extends StatelessWidget {
                       max: maxVelocity,
                     ),
                   ),
+                  Expanded(
+                    child: Slider(
+                      value: waypoint.accel,
+                      onChanged: (v) => pathModel.setAccel(index,v),
+                      min: 0,
+                      max: maxAccel
+                    ),
+                  ),
                   
                   SizedBox(width: 10),
                   Expanded(child:Text('Waypoint $index', style: TextStyle(color: Colors.white70))), //expanded not really needed
