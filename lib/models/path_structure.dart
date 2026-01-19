@@ -305,7 +305,7 @@ class PathImportResult {
   });
 }
 double distanceFormula(Offset prevPos, Offset pos) {
-  final dist = smath.sqrt(math.pow((pos.dy-prevPos.dy),2) + math.pow((pos.dx-prevPos.dx),2));
+  final dist = math.sqrt(math.pow((pos.dy-prevPos.dy),2) + math.pow((pos.dx-prevPos.dx),2));
   return dist;
 }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:ui' as ui;
+import 'dart:math' as math;
 import 'package:vector_math/vector_math.dart';
 //Speed and Velocity Variables
 //Inches per second , we will standarize to meters later
