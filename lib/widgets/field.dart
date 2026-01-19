@@ -247,11 +247,8 @@ class _FieldPainter extends CustomPainter {
       }
     }
     for (int i = 0; i < commands.length; i++) {
-      int waypointIndex = commands[i].waypointIndex;
-      if (waypointIndex < waypoints.length - 1) {
-        Offset? cmdPos = positionAtTauNormalizedByDistance(<Waypoint>[waypoints[waypointIndex],waypoints[waypointIndex+1]], commands[i].t);
-        canvas.drawCircle(toScreen(cmdPos!), drawingRadius, commandPaint);
-      }
+      Waypoint cmdPosition = pathModel.getPointAtTime(commands[i].t)
+      canvas.drawCircle(toScreen(cmdPos.pos), drawingRadius, commandPaint);
     }
   }
 
