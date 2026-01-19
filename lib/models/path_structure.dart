@@ -194,7 +194,7 @@ class PathModel extends ChangeNotifier {
     forwardPass[0] = startSpeed;
     for (int i = 1; i < n; i++) {
         double deltaDist = dist[i] - dist[i-1];
-        forwardPass[i] = min(maxVelocity,sqrt(pow(forwardPass[i-1], 2) + 2.0 * accels[i] * deltaDist));
+        forwardPass[i] = min(maxVelocity,math.sqrt(math.pow(forwardPass[i-1], 2) + 2.0 * accels[i] * deltaDist));
     }
 
     backwardPass[n-1] = endSpeed;
@@ -202,7 +202,7 @@ class PathModel extends ChangeNotifier {
         double deltaDist = dist[i+1] - dist[i];
         int segmentIndex = (pathTs[i].toInt());
         double a = segments[segmentIndex].maxAccel;
-        backwardPass[i] = min(maxVelocity,sqrt(pow(backwardPass[i+1], 2) + 2.0 * accels[i] * deltaDist));
+        backwardPass[i] = min(maxVelocity,math.sqrt(math.pow(backwardPass[i+1], 2) + 2.0 * accels[i] * deltaDist));
     }
 
     for (int i = 0; i < n; i++) {
@@ -310,7 +310,7 @@ double distanceFormula(Offset prevPos, Offset pos) {
 }
 
 Offset computeHandleOffset(Offset prevPos, Offset pos, [double? setLength]) {
-  final angle = atan2(pos.dy - prevPos.dy, pos.dx - prevPos.dx);
+  final angle = math.atan2(pos.dy - prevPos.dy, pos.dx - prevPos.dx);
   final effectiveLength = setLength ?? distanceFormula(prevPos, pos);
   return Offset.fromDirection(angle, effectiveLength/2.0);
 }

@@ -17,4 +17,7 @@ extension OffsetToVector2 on Offset {
 double clamp(double x, double minVal, double maxVal) {
   return math.max(minVal, math.min(x, maxVal));
 }
+double fmod(double a, double b) {
+  return a - b * (a / b).floor();
+}
 
