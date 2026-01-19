@@ -122,7 +122,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
                   children: [
                     const Text('Robot Path Visualizer', style: TextStyle(fontWeight: FontWeight.bold)),
                     const Spacer(),
-                    Text('Duration: ' + path.getDuration(), style: TextStyle(fontWeight: FontWeight.bold) ),
+                    Text('Duration: ${path.getDuration()}', style: TextStyle(fontWeight: FontWeight.bold) ),
                     const Spacer(),
                     ElevatedButton(
                       onPressed: () => setState(() => tValue = 0.0),

@@ -229,8 +229,8 @@ class PathModel extends ChangeNotifier {
     }
   }
   Waypoint getPointAtTime(double time) {
-      double t = clamp(lerp(times, pathTs, time), 0.0, segments.length.toDouble());
-      int i = clamp(t.toInt(), 0, segments.length - 1);
+      double t = clamp(lerp(times, pathTs, time), 0.0, segments.length.toDouble()).toDouble();
+      int i = clamp(t.toInt(), 0, segments.length - 1).toInt();
       double tLocal = fmod(t, 1.0000001);
 
       double desiredVelocity = lerp(times, velocities, time);
