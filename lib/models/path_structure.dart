@@ -1,5 +1,6 @@
 import 'package:graveyard_shift_simulator/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:graveyard_shift_simulary/segments.dart'
 import 'dart:math';
 //later add start and end speed to path model class
 //also move commands into pathmodel
@@ -61,8 +62,8 @@ extension DoublePrecision on double {
 
 extension OffsetJson on Offset {
   Map<String, double> toJson() => {
-    'x': (dx*0.0254).toPrecision(4),
-    'y': (dy*0.0254).toPrecision(4),
+    'x': (dx).toPrecision(4),
+    'y': (dy).toPrecision(4),
   };
 }
 
@@ -133,7 +134,12 @@ class PathModel extends ChangeNotifier {
   List<Waypoint> waypoints = [];
   double startSpeed = 0.0;
   double endSpeed = 0.0;
-
+  List<double> times, pathTs, velocities;
+  double duration = 0.0;
+  
+  void updateMotionProfile() {
+   
+  }
   void addWaypoint(Waypoint wp) {
     waypoints.add(wp);
     notifyListeners();
