@@ -210,12 +210,15 @@ class PathModel extends ChangeNotifier {
     }
   }
   double getVelAtT() {
-      const double t = std::clamp(lerp(this->times, this->pathTs, time), 0.0, static_cast<double>(this->segments.size()));
-      double i = std::clamp(static_cast<size_t>(t), (size_t) 0, this->segments.size() - 1);
+      const double t = clamp(lerp(times, pathTs, time), 0.0, segments.size().toDouble());
+      double i = clamp(t.toInt(), 0, segments.size() - 1);
       double tLocal = fmod(t, 1.0000001);
 
-      double desiredVelocity = lerp(this->times, this->velocities, time);
+      double desiredVelocity = lerp(times, velocities, time);
       return desiredVelocity;
+  }
+  double getDuration() {
+    return times[times.length()-1];
   }
   void addWaypoint(Waypoint wp) {
     waypoints.add(wp);
