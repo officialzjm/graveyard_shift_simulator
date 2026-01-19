@@ -2,11 +2,10 @@ import 'package:vector_math/vector_math.dart';
 import 'dart:math';
 
 class BezierSegment {
-    Vector2d p0, p1, p2, p3;
+    Vector2 p0, p1, p2, p3;
     double maxVel, maxAccel;
     bool reversed = false;
-
-    BezierSegment(this.p0, this.p1, this.p2, this.p3, this.maxVel, this.maxAccel, {this.reversed = false});
+    BezierSegment(this.p0, this.p1, this.p2, this.p3, this.maxVel, this.maxAccel, this.reversed});
 
 
     Vector3d poseAtT(double t) {
@@ -26,23 +25,23 @@ class BezierSegment {
         return Vector3d(x, y, theta);
     }
 
-    Vector2d derivative(double t) {
+    Vector2 derivative(double t) {
         double u = 1.0 - t;
         double tt = t * t;
         double uu = u * u;
 
         double dx = 3 * uu * (p1.x() - p0.x()) + 6 * u * t * (p2.x() - p1.x()) + 3 * tt * (p3.x() - p2.x());
         double dy = 3 * uu * (p1.y() - p0.y()) + 6 * u * t * (p2.y() - p1.y()) + 3 * tt * (p3.y() - p2.y());
-        return Vector2d(dx, dy);
+        return Vector2(dx, dy);
     }
 
-    Vector2d secondDerivative(double t) {
+    Vector2 secondDerivative(double t) {
         double u = 1.0 - t;
         double tt = t * t;
 
         double dx = 6 * u * (p2.x() - 2 * p1.x() + p0.x()) + 6 * tt * (p3.x() - 2 * p2.x() + p1.x());
         double dy = 6 * u * (p2.y() - 2 * p1.y() + p0.y()) + 6 * tt * (p3.y() - 2 * p2.y() + p1.y());
-        return Vector2d(dx, dy);
+        return Vector2(dx, dy);
     }
 
     double curvature(double t) {

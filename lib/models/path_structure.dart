@@ -140,9 +140,27 @@ class PathModel extends ChangeNotifier {
   List<double> velocities = [];
   double duration = 0.0;
   
+  double lerp(const List<double>& xs, const List<double>& ys, double x) {
+        if (x <= xs[0]) return ys[0];
+        if (x >= xs.back()) return ys.back();
+        for (int i = 1; i < xs.length(); ++i) {
+            if (xs[i] >= x) {
+                double t = (x - xs[i-1]) / (xs[i] - xs[i-1]);
+                return (1-t)*ys[i-1] + t*ys[i];
+            }
+        }
+        return ys.back();
+    }
+  
+  double limitSpeed(double k) {
+      if (abs(k) < 1e-6) return 1.0;
+      
+      return 1.0 / (1.0 + abs(k * 0.5) * trackWidth);
+  }
+  
   void updateMotionProfile() {
     List<BezierSegment> segments = [];
-    for (int i=0; i<waypoints.size(); i++) {
+    for (int i=0; i<waypoints.length(); i++) {
       segments.add(BezierSegment(waypoints[0].pos, waypoints[0].handleOut, waypoints[1].handleIn, waypoints[1].pos, waypoints[0].maxVel, waypoints[0].maxAccel, waypoints[0].reversed));
     }
     List<double> dist = [0.0];
@@ -151,9 +169,9 @@ class PathModel extends ChangeNotifier {
     pathTs.add(0.0);
     double totalDist = 0.0;
     
-    for (int i = 0; i < segments.size() - 1; ++i) { //-1?
+    for (int i = 0; i < segments.length() - 1; ++i) { //-1?
         double length = segments[i].totalArcLength();
-        int n = max(8, (int)(length * 20.0));
+        int n = max(8, (length * 20.0).toInt);
         for (int j = 1; j <= n; ++j) {
             double t = j/n.toDouble();
             pathTs.add(i.toDouble() + t);
@@ -165,25 +183,25 @@ class PathModel extends ChangeNotifier {
         }
         totalDist += length;
     }
-    vels[vels.size() - 1] = min(path.endSpeed, vels[vels.size() - 1]);
+    vels[vels.length() - 1] = min(endSpeed, vels[vels.length() - 1]);
 
 
-    int n = dist.size();
-    List<double> forwardPass = List<double>.filled(n, maxVel);    
-    List<double> backwardPass = List<double>.filled(n, maxVel);
+    int n = dist.length();
+    List<double> forwardPass = List<double>.filled(n, maxVelocity);    
+    List<double> backwardPass = List<double>.filled(n, maxVelocity);
 
-    forwardPass[0] = path.startSpeed;
+    forwardPass[0] = startSpeed;
     for (int i = 1; i < n; i++) {
         double deltaDist = dist[i] - dist[i-1];
-        forwardPass[i] = min(maxVel,sqrt(pow(forwardPass[i-1], 2) + 2.0 * accels[i] * deltaDist));
+        forwardPass[i] = min(maxVelocity,sqrt(pow(forwardPass[i-1], 2) + 2.0 * accels[i] * deltaDist));
     }
 
-    backwardPass[n-1] = path.endSpeed;
+    backwardPass[n-1] = endSpeed;
     for (int i = n - 2; i >= 0; i--) {
         double deltaDist = dist[i+1] - dist[i];
         int segmentIndex = (pathTs[i].toInt());
         double a = segments[segmentIndex].maxAccel;
-        backwardPass[i] = min(maxVel,sqrt(pow(backwardPass[i+1], 2) + 2.0 * accels[i] * deltaDist));
+        backwardPass[i] = min(maxVelocity,sqrt(pow(backwardPass[i+1], 2) + 2.0 * accels[i] * deltaDist));
     }
 
     for (int i = 0; i < n; i++) {
@@ -194,7 +212,7 @@ class PathModel extends ChangeNotifier {
     times.add(time);
     velocities.add(vels[0]);
 
-    for (int i = 1; i < vels.size(); i++) {
+    for (int i = 1; i < vels.length(); i++) {
         double deltaDist = dist[i] - dist[i - 1];
         double deltaVel = pow(vels[i],2) - pow(vels[i - 1],2);
         double a = deltaVel / (2.0 * deltaDist);
@@ -206,12 +224,12 @@ class PathModel extends ChangeNotifier {
         }
 
         times.add(time);
-        velocities.ad(vels[i]);
+        velocities.add(vels[i]);
     }
   }
-  double getVelAtT() {
-      const double t = clamp(lerp(times, pathTs, time), 0.0, segments.size().toDouble());
-      double i = clamp(t.toInt(), 0, segments.size() - 1);
+  double getVelAtT(double time) {
+      const double t = clamp(lerp(times, pathTs, time), 0.0, segments.length().toDouble());
+      double i = clamp(t.toInt(), 0, segments.length() - 1);
       double tLocal = fmod(t, 1.0000001);
 
       double desiredVelocity = lerp(times, velocities, time);
