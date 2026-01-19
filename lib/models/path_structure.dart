@@ -164,8 +164,13 @@ class PathModel extends ChangeNotifier {
     times = [];
     pathTs = [];
     velocities = [];
-    for (int i=0; i<waypoints.length; i++) {
-      segments.add(BezierSegment(waypoints[i].pos!.toVector2(), waypoints[i].handleOut!.toVector2(), waypoints[i].handleIn!.toVector2(), waypoints[i].pos!.toVector2(), waypoints[i].velocity, waypoints[i].accel, waypoints[i].reversed));
+    if (waypoints.length < 2) { return; } //through an error 
+    for (int i=0; i<waypoints.length-1; i++) { //l = 4 i = 0 < 3 0,1,2
+      final w1 = waypoints[i]; 
+      final w2 = waypoints[i + 1];
+      final hOut = w1.handleOut ?? w1.pos;
+      final hIn = w2.handleIn ?? w2.pos;
+      segments.add(BezierSegment(w1.pos.toVector2(), hOut.toVector2(), hIn.toVector2(), w2.pos.toVector2(), w1.velocity, w1.accel, w1.reversed));
     }
     List<double> dist = [0.0];
     List<double> vels = [math.min(segments[0].curvature(0.0),maxVelocity)];
@@ -173,7 +178,7 @@ class PathModel extends ChangeNotifier {
     pathTs.add(0.0);
     double totalDist = 0.0;
     
-    for (int i = 0; i < segments.length - 1; ++i) { //-1?
+    for (int i = 0; i < segments.length; ++i) { //-1?
         double length = segments[i].totalArcLength();
         int n = math.max(8, (length * 20.0).toInt());
         for (int j = 1; j <= n; ++j) {
@@ -242,7 +247,7 @@ class PathModel extends ChangeNotifier {
   }
   double getDuration() {
     if (times.isEmpty) return 0; 
-    return times.last; 
+    return times.last.toPrecision(2); 
   }
   void addWaypoint(Waypoint wp) {
     waypoints.add(wp);
