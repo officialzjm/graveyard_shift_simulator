@@ -207,7 +207,7 @@ class _FieldPainter extends CustomPainter {
 
     final drawingRadius = handleRadius * dynamicScale; // 2 inches scaled
 
-    final paintLine2 = Paint()
+    final paintVelPoint = Paint()
       ..style = PaintingStyle.fill//x
       ..strokeWidth = 15 / dynamicScale;
 
@@ -221,38 +221,21 @@ class _FieldPainter extends CustomPainter {
         final control2pos = waypoint2.handleIn != null ? toScreen(waypoint2.handleIn!) : null;
 
         if (control1pos != null && control2pos != null) {
-          /*
-          final path = Path()
-            ..moveTo(waypoint1pos.dx, waypoint1pos.dy)
-            ..cubicTo(control1.dx, control1.dy, control2.dx, control2.dy, waypoint2pos.dx, waypoint2pos.dy);
-          canvas.drawPath(path, paintLine);
-
-          
-          */
-          int samplesPerSegment = 50;
-          for (int s = 0; s < samplesPerSegment; s++) {
-            final t0 = s / samplesPerSegment;
-            final t1 = (s + 1) / samplesPerSegment;
-
-            
-
-            final pA = cubicPoint(waypoint1pos, control1pos, control2pos, waypoint2pos, t0);
-            final pB = cubicPoint(waypoint1pos, control1pos, control2pos, waypoint2pos, t1);
-
-            //final v = ui.lerpDouble(waypoint1.velocity, waypoint2.velocity, t0);
-            //if (v != null) {continue;}
-            final v = 60.0; //change
-            paintLine2
-              ..color = velocityToColor(v)
+          double pathDuration = path.getDuration();
+          for (double s = 0; s < pathDuration; s+= 0.05) {
+            double time = clamp(s,0,duration);
+            Waypoint desPoint = path.getPointAtTime(time);
+            paintVelPoint
+              ..color = velocityToColor(desPoint.velocity)
               ..style = PaintingStyle.stroke;
 
-            canvas.drawLine(pA, pB, paintLine2);
-            canvas.drawLine(waypoint1pos, control1pos, paintHandle);
-            canvas.drawLine(waypoint2pos, control2pos, paintHandle);
-            canvas.drawCircle(control1pos, drawingRadius, paintHandle);
-            canvas.drawCircle(control2pos, drawingRadius, paintHandle);
+            Waypoint desPoint = 
+            canvas.drawCircle(toScreen(desPoint.pos),drawingRadius,paintVelPoint)
           }
-
+          canvas.drawLine(waypoint1pos, control1pos, paintHandle);
+          canvas.drawLine(waypoint2pos, control2pos, paintHandle);
+          canvas.drawCircle(control1pos, drawingRadius, paintHandle);
+          canvas.drawCircle(control2pos, drawingRadius, paintHandle);
         } else {
           canvas.drawLine(waypoint1pos, waypoint2pos, paintLine);
         }

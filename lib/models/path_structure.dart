@@ -227,13 +227,14 @@ class PathModel extends ChangeNotifier {
         velocities.add(vels[i]);
     }
   }
-  double getVelAtT(double time) {
+  Waypoint getPointAtTime(double time) {
       const double t = clamp(lerp(times, pathTs, time), 0.0, segments.length().toDouble());
       double i = clamp(t.toInt(), 0, segments.length() - 1);
       double tLocal = fmod(t, 1.0000001);
 
       double desiredVelocity = lerp(times, velocities, time);
-      return desiredVelocity;
+      Vector3 pose = segments[i].poseAtT(tLocal);
+      return Waypoint(pos: {pose.x,pose.y}, velocity: desiredVelocity);
   }
   double getDuration() {
     return times[times.length()-1];
