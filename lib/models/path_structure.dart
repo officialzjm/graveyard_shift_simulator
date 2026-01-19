@@ -134,25 +134,25 @@ class PathModel extends ChangeNotifier {
   List<Waypoint> waypoints = [];
   double startSpeed = 0.0;
   double endSpeed = 0.0;
-  List<double> times = {};
-  List<double> pathTs = {};
-  List<double> velocities = {};
+  List<double> times = [];
+  List<double> pathTs = [];
+  List<double> velocities = [];
   double duration = 0.0;
   
   void updateMotionProfile() {
-    List<BezierSegment> segments = {}
+    List<BezierSegment> segments = []
     for (i=0; i<waypoints.size(); i++) {
       segments.add(Segment(waypoints[0].pos, waypoints[0].handleOut, waypoints[1].handleIn, waypoints[1].pos, waypoints[0].maxVel, waypoints[0].maxAccel, waypoints[0].reversed));
     }
-    List<double> dist{0.0};
-    List<double> vels{std::min(segments[0].curvature(0.0),maxVelocity)};
-    List<double> accels{0.0};
+    List<double> dist[0.0];
+    List<double> vels[min(segments[0].curvature(0.0),maxVelocity)];
+    List<double> accels[0.0];
     pathTs.add(0.0);
     double totalDist = 0.0;
     
-    for (int i = 0; i < segments.size(); ++i) {
+    for (int i = 0; i < segments.size() - 1; ++i) { //-1?
         double length = segments[i].totalArcLength();
-        int n = std::max(8, (int)(length * 20.0));
+        int n = max(8, (int)(length * 20.0));
         for (int j = 1; j <= n; ++j) {
             double t = j/n.toDouble();
             pathTs.add(i.toDouble() + t);
