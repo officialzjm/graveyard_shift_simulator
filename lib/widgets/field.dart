@@ -95,6 +95,7 @@ class _FieldViewState extends State<FieldView> {
             pathModel.addWaypoint(Waypoint(pos: secondWaypointPos, handleIn: secondWaypointPos + Offset(0,10)));
             pathModel.updateMotionProfile();
           } else {
+            if (waypoints.length < 2) return; // handle differently
             final prevLast = waypoints[waypoints.length - 2];
             final last = waypoints.last;
             final newHandleOut = last.pos + computeHandleOffset(prevLast.pos, last.pos, distanceFormula(realClickPos, last.pos));
@@ -211,10 +212,14 @@ class _FieldPainter extends CustomPainter {
 
 
     final drawingRadius = handleRadius * dynamicScale; // 2 inches scaled
+    final velRadius = .1 * dynamicScale; // 2 inches scaled
 
     final paintVelPoint = Paint()
       ..style = PaintingStyle.fill//x
       ..strokeWidth = 15 / dynamicScale;
+    if (pathModel.segments.isEmpty) return;
+
+    double duration = pathModel.getDuration();
 
     for (int i = 0; i < waypoints.length - 1; i++) {
       if (waypoints[i].visible) {
@@ -223,18 +228,18 @@ class _FieldPainter extends CustomPainter {
         final waypoint1pos = toScreen(waypoint1.pos);
         final waypoint2pos = toScreen(waypoint2.pos);
         final control1pos = waypoint1.handleOut != null ? toScreen(waypoint1.handleOut!) : null;
-        final control2pos = waypoint2.handleIn != null ? toScreen(waypoint2.handleIn!) : null;
-
+        final control2pos = waypoint2.handleIn != null ?   toScreen(waypoint2.handleIn!) : null;
+       
+        if (duration <= 0 || duration.isNaN) return;
         if (control1pos != null && control2pos != null) {
-          double duration = pathModel.getDuration();
-          for (double s = 0; s < duration; s+= 0.05) {
+          for (double s = 0; s < duration; s+= 0.2) {
             double time = clamp(s,0,duration).toDouble();
             Waypoint desPoint = pathModel.getPointAtTime(time);
             paintVelPoint
               ..color = velocityToColor(desPoint.velocity)
               ..style = PaintingStyle.stroke;
 
-            canvas.drawCircle(toScreen(desPoint.pos),drawingRadius,paintVelPoint);
+            canvas.drawCircle(toScreen(desPoint.pos),velRadius,paintVelPoint);
           }
           canvas.drawLine(waypoint1pos, control1pos, paintHandle);
           canvas.drawLine(waypoint2pos, control2pos, paintHandle);
