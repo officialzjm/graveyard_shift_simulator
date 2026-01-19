@@ -247,7 +247,7 @@ class _FieldPainter extends CustomPainter {
       }
     }
     for (int i = 0; i < commands.length; i++) {
-      Waypoint cmdPosition = pathModel.getPointAtTime(commands[i].t)
+      Waypoint cmdPos = pathModel.getPointAtTime(commands[i].t);
       canvas.drawCircle(toScreen(cmdPos.pos), drawingRadius, commandPaint);
     }
   }

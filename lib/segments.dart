@@ -48,7 +48,7 @@ class BezierSegment {
         Vector2 v1 = derivative(t);
         Vector2 v2 = secondDerivative(t);
         double num = (v1.x * v2.y - v1.y * v2.x).abs();
-        double den = math.pow(v1.squaredNorm(), 1.5);
+        double den = math.pow(v1.squaredNorm(), 1.5).toDouble();
         return den > 1e-6 ? num / den : 0.0;
     }
 
