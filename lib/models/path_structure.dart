@@ -142,14 +142,14 @@ class PathModel extends ChangeNotifier {
   
   double lerp(List<double> xs, List<double> ys, double x) {
         if (x <= xs[0]) return ys[0];
-        if (x >= xs.back()) return ys.back();
+        if (x >= xs.last) return ys.last;
         for (int i = 1; i < xs.length; ++i) {
             if (xs[i] >= x) {
                 double t = (x - xs[i-1]) / (xs[i] - xs[i-1]);
                 return (1-t)*ys[i-1] + t*ys[i];
             }
         }
-        return ys.back();
+        return ys.last;
     }
   
   double limitSpeed(double k) {

@@ -1,3 +1,5 @@
+import dart:ui
+import 'package:vector_math/vector_math.dart';
 //Speed and Velocity Variables
 //Inches per second , we will standarize to meters later
 const double maxVelocity = 70;

@@ -64,9 +64,9 @@ class BezierSegment {
         for (int i = 1; i <= samplingRate; ++i) {
             double u = t * i / samplingRate;
             Vector3 pos = poseAtT(u);
-            length += hypot(pos.x() - prevX, pos.y() - prevY);
-            prevX = pos.x(); prevY = pos.y();
+            length += hypot(pos.x - prevX, pos.y - prevY);
+            prevX = pos.x; prevY = pos.y;
         }
         return length;
     }
-};
+}
