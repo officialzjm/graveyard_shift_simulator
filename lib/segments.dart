@@ -1,4 +1,4 @@
-Class BezierSegment {
+class BezierSegment {
     Vector2d p0, p1, p2, p3;
     double maxVel, maxAccel;
     bool reversed = false;
