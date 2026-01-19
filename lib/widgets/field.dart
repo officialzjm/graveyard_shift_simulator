@@ -142,7 +142,7 @@ class _FieldViewState extends State<FieldView> {
             commands: commands,
             fieldImage: fieldImage,
             tValue: widget.tValue,
-            pathModel: path
+            pathModel: pathModel
           ),
         ),
       );
