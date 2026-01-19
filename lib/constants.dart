@@ -14,7 +14,7 @@ extension OffsetToVector2 on Offset {
   Vector2 toVector2() => Vector2(dx, dy);
 }
 
-double clamp(double x, double minVal, double maxVal) {
+num clamp(num x, num minVal, num maxVal) {
   return math.max(minVal, math.min(x, maxVal));
 }
 double fmod(double a, double b) {

@@ -215,7 +215,7 @@ class PathModel extends ChangeNotifier {
 
     for (int i = 1; i < vels.length; i++) {
         double deltaDist = dist[i] - dist[i - 1];
-        double deltaVel = math.pow(vels[i],2) - math.pow(vels[i - 1],2);
+        double deltaVel = math.pow(vels[i],2).toDouble() - math.pow(vels[i - 1],2).toDouble();
         double a = deltaVel / (2.0 * deltaDist);
         
         if (a.abs() > 0.1) {
@@ -230,7 +230,7 @@ class PathModel extends ChangeNotifier {
   }
   Waypoint getPointAtTime(double time) {
       double t = clamp(lerp(times, pathTs, time), 0.0, segments.length.toDouble());
-      double i = clamp(t.toInt(), 0, segments.length - 1);
+      int i = clamp(t.toInt(), 0, segments.length - 1);
       double tLocal = fmod(t, 1.0000001);
 
       double desiredVelocity = lerp(times, velocities, time);
