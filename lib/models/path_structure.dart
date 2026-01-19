@@ -133,6 +133,7 @@ class DragTargetInfo {
 
 class PathModel extends ChangeNotifier {
   List<Waypoint> waypoints = [];
+  List<BezierSegment> segments = [];
   double startSpeed = 0.0;
   double endSpeed = 0.0;
   List<double> times = [];
@@ -159,7 +160,7 @@ class PathModel extends ChangeNotifier {
   }
   
   void updateMotionProfile() {
-    List<BezierSegment> segments = [];
+    segments = [];
     for (int i=0; i<waypoints.length; i++) {
       segments.add(BezierSegment(waypoints[0].pos.toVector2(), waypoints[0].handleOut.toVector2(), waypoints[1].handleIn.toVector2(), waypoints[1].pos.toVector2(), waypoints[0].velocity, waypoints[0].accel, waypoints[0].reversed));
     }
@@ -228,7 +229,7 @@ class PathModel extends ChangeNotifier {
     }
   }
   Waypoint getPointAtTime(double time) {
-      const double t = clamp(lerp(times, pathTs, time), 0.0, segments.length.toDouble());
+      double t = clamp(lerp(times, pathTs, time), 0.0, segments.length.toDouble());
       double i = clamp(t.toInt(), 0, segments.length - 1);
       double tLocal = fmod(t, 1.0000001);
 
@@ -241,11 +242,13 @@ class PathModel extends ChangeNotifier {
   }
   void addWaypoint(Waypoint wp) {
     waypoints.add(wp);
+    updateMotionProfile();
     notifyListeners();
   }
 
   void removeWaypoint(int i) {
     waypoints.removeAt(i);
+    updateMotionProfile();
     notifyListeners();
   }
 
@@ -266,11 +269,13 @@ class PathModel extends ChangeNotifier {
 
   void setVelocity(int i, double velocity) {
     waypoints[i].velocity = velocity;
+    updateMotionProfile();
     notifyListeners();
   }
 
   void setAccel(int i, double accel) {
     waypoints[i].accel = accel;
+    updateMotionProfile();
     notifyListeners();
   }
 
