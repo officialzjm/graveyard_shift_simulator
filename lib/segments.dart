@@ -1,3 +1,5 @@
+import 'package:vector_math/vector_math.dart';
+
 class BezierSegment {
     Vector2d p0, p1, p2, p3;
     double maxVel, maxAccel;
@@ -6,7 +8,7 @@ class BezierSegment {
     BezierSegment(this.p0, this.p1, this.p2, this.p3, this.maxVel, this.maxAccel, {this.reversed = false});
 
 
-    Vector3d poseAtT(double t) const {
+    Vector3d poseAtT(double t) {
         double u = 1.0 - t;
         double tt = t * t;
         double uu = u * u;
@@ -23,7 +25,7 @@ class BezierSegment {
         return Vector3d(x, y, theta);
     }
 
-    Vector2d derivative(double t) const {
+    Vector2d derivative(double t) {
         double u = 1.0 - t;
         double tt = t * t;
         double uu = u * u;
@@ -33,7 +35,7 @@ class BezierSegment {
         return Vector2d(dx, dy);
     }
 
-    Vector2d secondDerivative(double t) const {
+    Vector2d secondDerivative(double t) {
         double u = 1.0 - t;
         double tt = t * t;
 
@@ -42,7 +44,7 @@ class BezierSegment {
         return Vector2d(dx, dy);
     }
 
-    double curvature(double t) const {
+    double curvature(double t) {
         auto v1 = derivative(t);
         auto v2 = secondDerivative(t);
         double num = abs(v1.x() * v2.y() - v1.y() * v2.x());
@@ -50,11 +52,11 @@ class BezierSegment {
         return den > 1e-6 ? num / den : 0.0;
     }
 
-    double totalArcLength() const {
+    double totalArcLength() {
         return arcLengthAtT(1.0);
     }
 
-    double arcLengthAtT(double t) const {
+    double arcLengthAtT(double t) {
         const int samplingRate = 50;
         double length = 0.0;
         double prevX = p0.x(), prevY = p0.y();

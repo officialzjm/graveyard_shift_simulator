@@ -1,6 +1,7 @@
 import 'package:graveyard_shift_simulator/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:graveyard_shift_simulator/segments.dart';
+import 'package:vector_math/vector_math.dart';
 import 'dart:math';
 //later add start and end speed to path model class
 //also move commands into pathmodel
@@ -188,6 +189,33 @@ class PathModel extends ChangeNotifier {
     for (size_t i = 0; i < n; i++) {
         vels[i] = min(forwardPass[i], backwardPass[i]);
     }
+    double time = 0.0;
+
+    times.add(time);
+    velocities.add(vels[0]);
+
+    for (int i = 1; i < vels.size(); i++) {
+        auto deltaDist = dist[i] - dist[i - 1];
+        auto deltaVel = pow(vels[i],2) - pow(vels[i - 1],2);
+        auto a = deltaVel / (2.0 * deltaDist);
+        
+        if (abs(a) > 0.1) {
+            time += (vels[i] - vels[i - 1]) / a;
+        } else {
+            time += deltaDist / vels[i];
+        }
+
+        times.add(time);
+        velocities.ad(vels[i]);
+    }
+  }
+  double getVelAtT() {
+      const double t = std::clamp(lerp(this->times, this->pathTs, time), 0.0, static_cast<double>(this->segments.size()));
+      double i = std::clamp(static_cast<size_t>(t), (size_t) 0, this->segments.size() - 1);
+      double tLocal = fmod(t, 1.0000001);
+
+      double desiredVelocity = lerp(this->times, this->velocities, time);
+      return desiredVelocity;
   }
   void addWaypoint(Waypoint wp) {
     waypoints.add(wp);
