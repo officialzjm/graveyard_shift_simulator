@@ -1,6 +1,6 @@
 import 'package:graveyard_shift_simulator/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:graveyard_shift_simulary/segments.dart';
+import 'package:graveyard_shift_simulator/segments.dart';
 import 'dart:math';
 //later add start and end speed to path model class
 //also move commands into pathmodel
@@ -168,8 +168,8 @@ class PathModel extends ChangeNotifier {
 
 
     int n = dist.size();
-    List<double> forwardPass(n, maxVel);
-    List<double> backwardPass(n, maxVel);
+    List<double> forwardPass = List<double>.filled(n, maxVel);    
+    List<double> backwardPass = List<double.filled(n, maxVel);
 
     forwardPass[0] = path.startSpeed;
     for (int i = 1; i < n; i++) {
