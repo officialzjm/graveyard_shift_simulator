@@ -161,8 +161,11 @@ class PathModel extends ChangeNotifier {
   
   void updateMotionProfile() {
     segments = [];
+    times = [];
+    pathTs = [];
+    velocities = [];
     for (int i=0; i<waypoints.length; i++) {
-      segments.add(BezierSegment(waypoints[0].pos!.toVector2(), waypoints[0].handleOut!.toVector2(), waypoints[1].handleIn!.toVector2(), waypoints[1].pos!.toVector2(), waypoints[0].velocity, waypoints[0].accel, waypoints[0].reversed));
+      segments.add(BezierSegment(waypoints[i].pos!.toVector2(), waypoints[i].handleOut!.toVector2(), waypoints[i].handleIn!.toVector2(), waypoints[i].pos!.toVector2(), waypoints[i].velocity, waypoints[i].accel, waypoints[i].reversed));
     }
     List<double> dist = [0.0];
     List<double> vels = [math.min(segments[0].curvature(0.0),maxVelocity)];
