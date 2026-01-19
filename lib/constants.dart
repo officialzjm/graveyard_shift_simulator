@@ -21,4 +21,6 @@ num clamp(num x, num minVal, num maxVal) {
 double fmod(double a, double b) {
   return a - b * (a / b).floor();
 }
-
+extension Vector2Norm on Vector2 {
+  double squaredNorm() => x * x + y * y;
+}
