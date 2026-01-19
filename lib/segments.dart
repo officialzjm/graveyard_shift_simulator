@@ -1,4 +1,5 @@
 import 'package:vector_math/vector_math.dart';
+import 'dart:math';
 
 class BezierSegment {
     Vector2d p0, p1, p2, p3;

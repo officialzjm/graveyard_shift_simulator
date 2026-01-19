@@ -142,12 +142,12 @@ class PathModel extends ChangeNotifier {
   
   void updateMotionProfile() {
     List<BezierSegment> segments = [];
-    for (i=0; i<waypoints.size(); i++) {
+    for (int i=0; i<waypoints.size(); i++) {
       segments.add(BezierSegment(waypoints[0].pos, waypoints[0].handleOut, waypoints[1].handleIn, waypoints[1].pos, waypoints[0].maxVel, waypoints[0].maxAccel, waypoints[0].reversed));
     }
-    List<double> dist[0.0];
-    List<double> vels[min(segments[0].curvature(0.0),maxVelocity)];
-    List<double> accels[0.0];
+    List<double> dist = [0.0];
+    List<double> vels = [min(segments[0].curvature(0.0),maxVelocity)];
+    List<double> accels = [0.0];
     pathTs.add(0.0);
     double totalDist = 0.0;
     
@@ -170,7 +170,7 @@ class PathModel extends ChangeNotifier {
 
     int n = dist.size();
     List<double> forwardPass = List<double>.filled(n, maxVel);    
-    List<double> backwardPass = List<double.filled(n, maxVel);
+    List<double> backwardPass = List<double>.filled(n, maxVel);
 
     forwardPass[0] = path.startSpeed;
     for (int i = 1; i < n; i++) {
@@ -181,12 +181,12 @@ class PathModel extends ChangeNotifier {
     backwardPass[n-1] = path.endSpeed;
     for (int i = n - 2; i >= 0; i--) {
         double deltaDist = dist[i+1] - dist[i];
-        size_t segmentIndex = (pathTs[i].toInt());
+        int segmentIndex = (pathTs[i].toInt());
         double a = segments[segmentIndex].maxAccel;
         backwardPass[i] = min(maxVel,sqrt(pow(backwardPass[i+1], 2) + 2.0 * accels[i] * deltaDist));
     }
 
-    for (size_t i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++) {
         vels[i] = min(forwardPass[i], backwardPass[i]);
     }
     double time = 0.0;
@@ -195,9 +195,9 @@ class PathModel extends ChangeNotifier {
     velocities.add(vels[0]);
 
     for (int i = 1; i < vels.size(); i++) {
-        auto deltaDist = dist[i] - dist[i - 1];
-        auto deltaVel = pow(vels[i],2) - pow(vels[i - 1],2);
-        auto a = deltaVel / (2.0 * deltaDist);
+        double deltaDist = dist[i] - dist[i - 1];
+        double deltaVel = pow(vels[i],2) - pow(vels[i - 1],2);
+        double a = deltaVel / (2.0 * deltaDist);
         
         if (abs(a) > 0.1) {
             time += (vels[i] - vels[i - 1]) / a;
