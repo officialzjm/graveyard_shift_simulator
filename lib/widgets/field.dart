@@ -234,6 +234,8 @@ class _FieldPainter extends CustomPainter {
             final t0 = s / samplesPerSegment;
             final t1 = (s + 1) / samplesPerSegment;
 
+            
+
             final pA = cubicPoint(waypoint1pos, control1pos, control2pos, waypoint2pos, t0);
             final pB = cubicPoint(waypoint1pos, control1pos, control2pos, waypoint2pos, t1);
 

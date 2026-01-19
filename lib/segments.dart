@@ -1,6 +1,6 @@
 import 'package:vector_math/vector_math.dart';
 import 'dart:math';
-
+double hypot(double a, double b) => sqrt(a * a + b * b);
 class BezierSegment {
     Vector2 p0, p1, p2, p3;
     double maxVel, maxAccel;
