@@ -5,10 +5,10 @@ class BezierSegment {
     Vector2 p0, p1, p2, p3;
     double maxVel, maxAccel;
     bool reversed = false;
-    BezierSegment(this.p0, this.p1, this.p2, this.p3, this.maxVel, this.maxAccel, this.reversed});
+    BezierSegment(this.p0, this.p1, this.p2, this.p3, this.maxVel, this.maxAccel, this.reversed);
 
 
-    Vector3d poseAtT(double t) {
+    Vector3 poseAtT(double t) {
         double u = 1.0 - t;
         double tt = t * t;
         double uu = u * u;
@@ -22,7 +22,7 @@ class BezierSegment {
         double dy = 3 * uu * (p1.y() - p0.y()) + 6 * u * t * (p2.y() - p1.y()) + 3 * tt * (p3.y() - p2.y());
         double theta = atan2(dy, dx);
 
-        return Vector3d(x, y, theta);
+        return Vector3(x, y, theta);
     }
 
     Vector2 derivative(double t) {
@@ -45,8 +45,8 @@ class BezierSegment {
     }
 
     double curvature(double t) {
-        auto v1 = derivative(t);
-        auto v2 = secondDerivative(t);
+        double v1 = derivative(t);
+        double v2 = secondDerivative(t);
         double num = abs(v1.x() * v2.y() - v1.y() * v2.x());
         double den = pow(v1.squaredNorm(), 1.5);
         return den > 1e-6 ? num / den : 0.0;
@@ -63,7 +63,7 @@ class BezierSegment {
         
         for (int i = 1; i <= samplingRate; ++i) {
             double u = t * i / samplingRate;
-            Vector3d pos = poseAtT(u);
+            Vector3 pos = poseAtT(u);
             length += hypot(pos.x() - prevX, pos.y() - prevY);
             prevX = pos.x(); prevY = pos.y();
         }
