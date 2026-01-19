@@ -140,10 +140,10 @@ class PathModel extends ChangeNotifier {
   List<double> velocities = [];
   double duration = 0.0;
   
-  double lerp(const List<double>& xs, const List<double>& ys, double x) {
+  double lerp(List<double> xs, List<double> ys, double x) {
         if (x <= xs[0]) return ys[0];
         if (x >= xs.back()) return ys.back();
-        for (int i = 1; i < xs.length(); ++i) {
+        for (int i = 1; i < xs.length; ++i) {
             if (xs[i] >= x) {
                 double t = (x - xs[i-1]) / (xs[i] - xs[i-1]);
                 return (1-t)*ys[i-1] + t*ys[i];
@@ -160,8 +160,8 @@ class PathModel extends ChangeNotifier {
   
   void updateMotionProfile() {
     List<BezierSegment> segments = [];
-    for (int i=0; i<waypoints.length(); i++) {
-      segments.add(BezierSegment(waypoints[0].pos, waypoints[0].handleOut, waypoints[1].handleIn, waypoints[1].pos, waypoints[0].maxVel, waypoints[0].maxAccel, waypoints[0].reversed));
+    for (int i=0; i<waypoints.length; i++) {
+      segments.add(BezierSegment(waypoints[0].pos.toVector2(), waypoints[0].handleOut.toVector2(), waypoints[1].handleIn.toVector2(), waypoints[1].pos.toVector2(), waypoints[0].velocity, waypoints[0].accel, waypoints[0].reversed));
     }
     List<double> dist = [0.0];
     List<double> vels = [min(segments[0].curvature(0.0),maxVelocity)];
@@ -169,7 +169,7 @@ class PathModel extends ChangeNotifier {
     pathTs.add(0.0);
     double totalDist = 0.0;
     
-    for (int i = 0; i < segments.length() - 1; ++i) { //-1?
+    for (int i = 0; i < segments.length - 1; ++i) { //-1?
         double length = segments[i].totalArcLength();
         int n = max(8, (length * 20.0).toInt);
         for (int j = 1; j <= n; ++j) {
@@ -183,10 +183,10 @@ class PathModel extends ChangeNotifier {
         }
         totalDist += length;
     }
-    vels[vels.length() - 1] = min(endSpeed, vels[vels.length() - 1]);
+    vels[vels.length - 1] = min(endSpeed, vels[vels.length - 1]);
 
 
-    int n = dist.length();
+    int n = dist.length;
     List<double> forwardPass = List<double>.filled(n, maxVelocity);    
     List<double> backwardPass = List<double>.filled(n, maxVelocity);
 
@@ -212,7 +212,7 @@ class PathModel extends ChangeNotifier {
     times.add(time);
     velocities.add(vels[0]);
 
-    for (int i = 1; i < vels.length(); i++) {
+    for (int i = 1; i < vels.length; i++) {
         double deltaDist = dist[i] - dist[i - 1];
         double deltaVel = pow(vels[i],2) - pow(vels[i - 1],2);
         double a = deltaVel / (2.0 * deltaDist);
@@ -228,8 +228,8 @@ class PathModel extends ChangeNotifier {
     }
   }
   Waypoint getPointAtTime(double time) {
-      const double t = clamp(lerp(times, pathTs, time), 0.0, segments.length().toDouble());
-      double i = clamp(t.toInt(), 0, segments.length() - 1);
+      const double t = clamp(lerp(times, pathTs, time), 0.0, segments.length.toDouble());
+      double i = clamp(t.toInt(), 0, segments.length - 1);
       double tLocal = fmod(t, 1.0000001);
 
       double desiredVelocity = lerp(times, velocities, time);
@@ -237,7 +237,7 @@ class PathModel extends ChangeNotifier {
       return Waypoint(pos: {pose.x,pose.y}, velocity: desiredVelocity);
   }
   double getDuration() {
-    return times[times.length()-1];
+    return times[times.length-1];
   }
   void addWaypoint(Waypoint wp) {
     waypoints.add(wp);
