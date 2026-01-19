@@ -79334,77 +79334,78 @@ o=(c-p)/(q-p)
 return(1-o)*b[s]+o*b[r]}}return B.b.ga2(b)},
 aiP(a){if(Math.abs(a)<0.000001)return 1
 return 1/(1+Math.abs(a*0.5)*5.5)},
-zc(){var s,r,q,p,o,n,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1,a2,a3,a4=this
-a4.b=A.c([],t.Ce)
-for(s=0;r=a4.a,s<r.length;++s){q=a4.b
-p=r[0]
-o=p.a
-n=new Float32Array(2)
-n[1]=o.b
-n[0]=o.a
-o=p.c
-m=o.a
+zc(){var s,r,q,p,o,n,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1,a2,a3,a4,a5,a6=this
+a6.b=A.c([],t.Ce)
+s=t.n
+a6.e=A.c([],s)
+a6.f=A.c([],s)
+a6.r=A.c([],s)
+for(r=0;q=a6.a,r<q.length;++r){p=a6.b
+q=q[r]
+o=q.a
+n=o.a
 o=o.b
+m=new Float32Array(2)
+m[1]=o
+m[0]=n
+l=q.c
+k=l.a
+l=l.b
+j=new Float32Array(2)
+j[1]=l
+j[0]=k
+k=q.b
+l=k.a
+k=k.b
+i=new Float32Array(2)
+i[1]=k
+i[0]=l
 l=new Float32Array(2)
 l[1]=o
-l[0]=m
-r=r[1]
-m=r.b
-o=m.a
-m=m.b
-k=new Float32Array(2)
-k[1]=m
-k[0]=o
-r=r.a
-o=new Float32Array(2)
-o[1]=r.b
-o[0]=r.a
-q.push(new A.Gw(new A.hA(n),new A.hA(l),new A.hA(k),new A.hA(o),p.d,p.e))}r=t.n
-j=A.c([0],r)
-i=A.c([Math.min(a4.b[0].QW(0),70)],r)
-h=A.c([0],r)
-r=a4.f
-r.push(0)
-for(g=0,s=0;q=a4.b,s<q.length-1;++s){f=q[s].PV(1)
-e=Math.max(8,B.c.eD(f*20))
-for(d=1;d<=e;++d){c=d/e
-r.push(s+c)
-j.push(g+a4.b[s].PV(c))
-b=a4.b[s].QW(c)
-i.push(Math.min(a4.b[s].e,a4.aiP(b)*70))
-h.push(a4.b[s].f)}g+=f}q=i.length-1
-i[q]=Math.min(a4.d,i[q])
-e=j.length
-q=t.i
-a=A.bt(e,70,!1,q)
-a0=A.bt(e,70,!1,q)
-a[0]=a4.c
-for(s=1;s<e;++s){q=j[s]
-p=s-1
-o=j[p]
-a[s]=Math.min(70,Math.sqrt(Math.pow(a[p],2)+2*h[s]*(q-o)))}a0[e-1]=a4.d
-for(s=e-2;s>=0;--s){q=s+1
-p=j[q]
-o=j[s]
-B.c.eD(r[s])
-a0[s]=Math.min(70,Math.sqrt(Math.pow(a0[q],2)+2*h[s]*(p-o)))}for(s=0;s<e;++s)i[s]=Math.min(a[s],a0[s])
-r=a4.e
-r.push(0)
-q=a4.r
-q.push(i[0])
-for(a1=0,s=1;s<i.length;++s){p=s-1
-a2=j[s]-j[p]
-a3=(Math.pow(i[s],2)-Math.pow(i[p],2))/(2*a2)
-a1=Math.abs(a3)>0.1?a1+(i[s]-i[p])/a3:a1+a2/i[s]
-r.push(a1)
-q.push(i[s])}},
-Hc(a){var s,r=this,q=r.e,p=r.T9(q,r.f,a),o=r.b.length,n=Math.max(0,Math.min(p,o)),m=B.c.eD(Math.max(0,Math.min(B.c.eD(n),o-1)))
-o=B.c.ib(n/1.0000001)
-s=r.T9(q,r.r,a)
-o=r.b[m].TO(n-1.0000001*o).a
-return new A.h6(new A.h(o[0],o[1]),null,null,s,1,!0,!1)},
+l[0]=n
+p.push(new A.Gw(new A.hA(m),new A.hA(j),new A.hA(i),new A.hA(l),q.d,q.e))}h=A.c([0],s)
+g=A.c([Math.min(a6.b[0].QW(0),70)],s)
+f=A.c([0],s)
+a6.f.push(0)
+for(e=0,r=0;s=a6.b,r<s.length-1;++r){d=s[r].PV(1)
+c=Math.max(8,B.c.eD(d*20))
+for(b=1;b<=c;++b){a=b/c
+a6.f.push(r+a)
+h.push(e+a6.b[r].PV(a))
+a0=a6.b[r].QW(a)
+g.push(Math.min(a6.b[r].e,a6.aiP(a0)*70))
+f.push(a6.b[r].f)}e+=d}s=g.length-1
+g[s]=Math.min(a6.d,g[s])
+c=h.length
+s=t.i
+a1=A.bt(c,70,!1,s)
+a2=A.bt(c,70,!1,s)
+a1[0]=a6.c
+for(r=1;r<c;++r){s=h[r]
+q=r-1
+p=h[q]
+a1[r]=Math.min(70,Math.sqrt(Math.pow(a1[q],2)+2*f[r]*(s-p)))}a2[c-1]=a6.d
+for(r=c-2;r>=0;--r){s=r+1
+q=h[s]
+p=h[r]
+B.c.eD(a6.f[r])
+a2[r]=Math.min(70,Math.sqrt(Math.pow(a2[s],2)+2*f[r]*(q-p)))}for(r=0;r<c;++r)g[r]=Math.min(a1[r],a2[r])
+a6.e.push(0)
+a6.r.push(g[0])
+for(a3=0,r=1;r<g.length;++r){s=r-1
+a4=h[r]-h[s]
+a5=(Math.pow(g[r],2)-Math.pow(g[s],2))/(2*a4)
+a3=Math.abs(a5)>0.1?a3+(g[r]-g[s])/a5:a3+a4/g[r]
+a6.e.push(a3)
+a6.r.push(g[r])}},
+Hc(a){var s,r=this,q=r.T9(r.e,r.f,a),p=r.b.length,o=Math.max(0,Math.min(q,p)),n=B.c.eD(Math.max(0,Math.min(B.c.eD(o),p-1)))
+p=B.c.ib(o/1.0000001)
+s=r.T9(r.e,r.r,a)
+p=r.b[n].TO(o-1.0000001*p).a
+return new A.h6(new A.h(p[0],p[1]),null,null,s,1,!0,!1)},
 GZ(){var s=this.e
-return s[s.length-1]},
+if(s.length===0)return 0
+return B.b.ga2(s)},
 rj(a){this.a.push(a)
 this.zc()
 this.ai()}}
