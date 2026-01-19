@@ -1,4 +1,5 @@
 import 'package:vector_math/vector_math.dart';
+import 'package:graveyard_shift_simulator/constants.dart';
 import 'dart:math' as math;
 double hypot(double a, double b) => math.sqrt(a * a + b * b);
 class BezierSegment {
