@@ -24,7 +24,8 @@ class _PlannerScreenState extends State<PlannerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final waypoints = context.watch<PathModel>().waypoints;
+    final path = context.watch<PathModel>();
+    final waypoints = path.waypoints;
     final commandList = context.watch<CommandList>();
     final commands = commandList.commands; // <-- typed list
     return Scaffold(
@@ -84,11 +85,11 @@ class _PlannerScreenState extends State<PlannerScreen> {
               ],
             ),
           ),
-          Expanded( // Outer Expanded for field+sidebar
+          Expanded( 
   child: Row(
     
     children: [
-      const SizedBox(width: 12), // 👈 THIS is the missing piece
+      const SizedBox(width: 12), 
       // Field - fixed
       Expanded(child:
       Column(
@@ -120,6 +121,8 @@ class _PlannerScreenState extends State<PlannerScreen> {
                 Row(
                   children: [
                     const Text('Robot Path Visualizer', style: TextStyle(fontWeight: FontWeight.bold)),
+                    const Spacer(),
+                    Text('Duration: ' + path.getDuration(), style: TextStyle(fontWeight: FontWeight.bold) ),
                     const Spacer(),
                     ElevatedButton(
                       onPressed: () => setState(() => tValue = 0.0),
