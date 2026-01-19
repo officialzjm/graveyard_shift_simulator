@@ -154,37 +154,37 @@ class PathModel extends ChangeNotifier {
     }
   
   double limitSpeed(double k) {
-      if (math.abs(k) < 1e-6) return 1.0;
+      if (k.abs() < 1e-6) return 1.0;
       
-      return 1.0 / (1.0 + math.abs(k * 0.5) * trackWidth);
+      return 1.0 / (1.0 + (k * 0.5).abs() * trackWidth);
   }
   
   void updateMotionProfile() {
     segments = [];
     for (int i=0; i<waypoints.length; i++) {
-      segments.add(BezierSegment(waypoints[0].pos.toVector2(), waypoints[0].handleOut.toVector2(), waypoints[1].handleIn.toVector2(), waypoints[1].pos.toVector2(), waypoints[0].velocity, waypoints[0].accel, waypoints[0].reversed));
+      segments.add(BezierSegment(waypoints[0].pos!.toVector2(), waypoints[0].handleOut!.toVector2(), waypoints[1].handleIn!.toVector2(), waypoints[1].pos!.toVector2(), waypoints[0].velocity, waypoints[0].accel, waypoints[0].reversed));
     }
     List<double> dist = [0.0];
-    List<double> vels = [min(segments[0].curvature(0.0),maxVelocity)];
+    List<double> vels = [math.min(segments[0].curvature(0.0),maxVelocity)];
     List<double> accels = [0.0];
     pathTs.add(0.0);
     double totalDist = 0.0;
     
     for (int i = 0; i < segments.length - 1; ++i) { //-1?
         double length = segments[i].totalArcLength();
-        int n = max(8, (length * 20.0).toInt());
+        int n = math.max(8, (length * 20.0).toInt());
         for (int j = 1; j <= n; ++j) {
             double t = j/n.toDouble();
             pathTs.add(i.toDouble() + t);
         
             dist.add(totalDist + segments[i].arcLengthAtT(t));
             double k = segments[i].curvature(t);
-            vels.add(min(segments[i].maxVel, limitSpeed(k) * maxVelocity));
+            vels.add(math.min(segments[i].maxVel, limitSpeed(k) * maxVelocity));
             accels.add(segments[i].maxAccel);
         }
         totalDist += length;
     }
-    vels[vels.length - 1] = min(endSpeed, vels[vels.length - 1]);
+    vels[vels.length - 1] = math.min(endSpeed, vels[vels.length - 1]);
 
 
     int n = dist.length;
@@ -194,7 +194,7 @@ class PathModel extends ChangeNotifier {
     forwardPass[0] = startSpeed;
     for (int i = 1; i < n; i++) {
         double deltaDist = dist[i] - dist[i-1];
-        forwardPass[i] = min(maxVelocity,math.sqrt(math.pow(forwardPass[i-1], 2) + 2.0 * accels[i] * deltaDist));
+        forwardPass[i] = math.min(maxVelocity,math.sqrt(math.pow(forwardPass[i-1], 2) + 2.0 * accels[i] * deltaDist));
     }
 
     backwardPass[n-1] = endSpeed;
@@ -202,11 +202,11 @@ class PathModel extends ChangeNotifier {
         double deltaDist = dist[i+1] - dist[i];
         int segmentIndex = (pathTs[i].toInt());
         double a = segments[segmentIndex].maxAccel;
-        backwardPass[i] = min(maxVelocity,math.sqrt(math.pow(backwardPass[i+1], 2) + 2.0 * accels[i] * deltaDist));
+        backwardPass[i] = math.min(maxVelocity,math.sqrt(math.pow(backwardPass[i+1], 2) + 2.0 * accels[i] * deltaDist));
     }
 
     for (int i = 0; i < n; i++) {
-        vels[i] = min(forwardPass[i], backwardPass[i]);
+        vels[i] = math.min(forwardPass[i], backwardPass[i]);
     }
     double time = 0.0;
 
@@ -215,10 +215,10 @@ class PathModel extends ChangeNotifier {
 
     for (int i = 1; i < vels.length; i++) {
         double deltaDist = dist[i] - dist[i - 1];
-        double deltaVel = pow(vels[i],2) - pow(vels[i - 1],2);
+        double deltaVel = math.pow(vels[i],2) - math.pow(vels[i - 1],2);
         double a = deltaVel / (2.0 * deltaDist);
         
-        if (abs(a) > 0.1) {
+        if (a.abs() > 0.1) {
             time += (vels[i] - vels[i - 1]) / a;
         } else {
             time += deltaDist / vels[i];
@@ -305,7 +305,7 @@ class PathImportResult {
   });
 }
 double distanceFormula(Offset prevPos, Offset pos) {
-  final dist = sqrt(pow((pos.dy-prevPos.dy),2) + pow((pos.dx-prevPos.dx),2));
+  final dist = smath.sqrt(math.pow((pos.dy-prevPos.dy),2) + math.pow((pos.dx-prevPos.dx),2));
   return dist;
 }
 
