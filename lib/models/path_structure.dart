@@ -2,7 +2,7 @@ import 'package:graveyard_shift_simulator/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:graveyard_shift_simulator/segments.dart';
 import 'package:vector_math/vector_math.dart';
-import 'dart:math';
+import 'dart:math' as math;
 //later add start and end speed to path model class
 //also move commands into pathmodel
 class Waypoint {
@@ -153,9 +153,9 @@ class PathModel extends ChangeNotifier {
     }
   
   double limitSpeed(double k) {
-      if (abs(k) < 1e-6) return 1.0;
+      if (math.abs(k) < 1e-6) return 1.0;
       
-      return 1.0 / (1.0 + abs(k * 0.5) * trackWidth);
+      return 1.0 / (1.0 + math.abs(k * 0.5) * trackWidth);
   }
   
   void updateMotionProfile() {
@@ -171,14 +171,14 @@ class PathModel extends ChangeNotifier {
     
     for (int i = 0; i < segments.length - 1; ++i) { //-1?
         double length = segments[i].totalArcLength();
-        int n = max(8, (length * 20.0).toInt);
+        int n = max(8, (length * 20.0).toInt());
         for (int j = 1; j <= n; ++j) {
             double t = j/n.toDouble();
             pathTs.add(i.toDouble() + t);
         
             dist.add(totalDist + segments[i].arcLengthAtT(t));
             double k = segments[i].curvature(t);
-            vels.add(min(segments[i].maxVel, limitSpeed(k) * maxVel));
+            vels.add(min(segments[i].maxVel, limitSpeed(k) * maxVelocity));
             accels.add(segments[i].maxAccel);
         }
         totalDist += length;
