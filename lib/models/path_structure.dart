@@ -238,6 +238,8 @@ class PathModel extends ChangeNotifier {
       return Waypoint(pos: Offset(pose.x,pose.y), velocity: desiredVelocity);
   }
   double getDuration() {
+    double duration = times[times.length-1];
+    if (duration == null) {duration = 0;}
     return times[times.length-1];
   }
   void addWaypoint(Waypoint wp) {

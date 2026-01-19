@@ -74,7 +74,7 @@ class _FieldViewState extends State<FieldView> {
 
   @override
   Widget build(BuildContext context) {
-      final pathModel = context.read<PathModel>();
+      final pathModel = context.watch<PathModel>();
       final commands = context.read<CommandList>().commands;
       final waypoints = pathModel.waypoints;
       return LayoutBuilder(builder: (context, constraints) {
