@@ -235,7 +235,7 @@ class PathModel extends ChangeNotifier {
 
       double desiredVelocity = lerp(times, velocities, time);
       Vector3 pose = segments[i].poseAtT(tLocal);
-      return Waypoint(pos: {pose.x,pose.y}, velocity: desiredVelocity);
+      return Waypoint(pos: Offset(pose.x,pose.y), velocity: desiredVelocity);
   }
   double getDuration() {
     return times[times.length-1];
