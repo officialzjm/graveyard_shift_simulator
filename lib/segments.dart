@@ -1,5 +1,5 @@
 import 'package:vector_math/vector_math.dart';
-import 'dart:math';
+import 'dart:math' as math;
 double hypot(double a, double b) => sqrt(a * a + b * b);
 class BezierSegment {
     Vector2 p0, p1, p2, p3;
@@ -47,8 +47,8 @@ class BezierSegment {
     double curvature(double t) {
         Vector2 v1 = derivative(t);
         Vector2 v2 = secondDerivative(t);
-        double num = abs(v1.x * v2.y - v1.y * v2.x);
-        double den = pow(v1.squaredNorm(), 1.5);
+        double num = math.abs(v1.x * v2.y - v1.y * v2.x);
+        double den = math.pow(v1.squaredNorm(), 1.5);
         return den > 1e-6 ? num / den : 0.0;
     }
 

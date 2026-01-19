@@ -124,8 +124,8 @@ class CommandRow extends StatelessWidget {
                 flex: 8,
                 child: TextField(
                   decoration: const InputDecoration(
-                    labelText: 'Distance along the path',
-                    hintText: '0 < tau < 1',
+                    labelText: 'Time along the path',
+                    hintText: '0<time<d',
                   ),
                   keyboardType:
                       TextInputType.numberWithOptions(decimal: true),

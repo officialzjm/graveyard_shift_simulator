@@ -142,7 +142,7 @@ class _FieldViewState extends State<FieldView> {
             commands: commands,
             fieldImage: fieldImage,
             tValue: widget.tValue,
-            duration: path.getDuration()
+            pathModel: path
           ),
         ),
       );
@@ -156,7 +156,7 @@ class _FieldPainter extends CustomPainter {
   final List<Command> commands;
   final Offset Function(Offset) toScreen; 
   final double tValue;
-  final double duration;
+  final PathModel pathModel;
 
   _FieldPainter({
     this.fieldImage,
@@ -164,7 +164,7 @@ class _FieldPainter extends CustomPainter {
     required this.commands,
     required this.toScreen,
     required this.tValue,
-    required this.duration
+    required this.pathModel
   });
 
 
@@ -224,9 +224,10 @@ class _FieldPainter extends CustomPainter {
         final control2pos = waypoint2.handleIn != null ? toScreen(waypoint2.handleIn!) : null;
 
         if (control1pos != null && control2pos != null) {
+          double duration = pathModel.getDuration();
           for (double s = 0; s < duration; s+= 0.05) {
             double time = clamp(s,0,duration).toDouble();
-            Waypoint desPoint = path.getPointAtTime(time);
+            Waypoint desPoint = pathModel.getPointAtTime(time);
             paintVelPoint
               ..color = velocityToColor(desPoint.velocity)
               ..style = PaintingStyle.stroke;
