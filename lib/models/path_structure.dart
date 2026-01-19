@@ -1,6 +1,6 @@
 import 'package:graveyard_shift_simulator/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:graveyard_shift_simulary/segments.dart'
+import 'package:graveyard_shift_simulary/segments.dart';
 import 'dart:math';
 //later add start and end speed to path model class
 //also move commands into pathmodel
@@ -140,9 +140,9 @@ class PathModel extends ChangeNotifier {
   double duration = 0.0;
   
   void updateMotionProfile() {
-    List<BezierSegment> segments = []
+    List<BezierSegment> segments = [];
     for (i=0; i<waypoints.size(); i++) {
-      segments.add(Segment(waypoints[0].pos, waypoints[0].handleOut, waypoints[1].handleIn, waypoints[1].pos, waypoints[0].maxVel, waypoints[0].maxAccel, waypoints[0].reversed));
+      segments.add(BezierSegment(waypoints[0].pos, waypoints[0].handleOut, waypoints[1].handleIn, waypoints[1].pos, waypoints[0].maxVel, waypoints[0].maxAccel, waypoints[0].reversed));
     }
     List<double> dist[0.0];
     List<double> vels[min(segments[0].curvature(0.0),maxVelocity)];
@@ -172,7 +172,7 @@ class PathModel extends ChangeNotifier {
     List<double> backwardPass(n, maxVel);
 
     forwardPass[0] = path.startSpeed;
-    for (size_t i = 1; i < n; i++) {
+    for (int i = 1; i < n; i++) {
         double deltaDist = dist[i] - dist[i-1];
         forwardPass[i] = min(maxVel,sqrt(pow(forwardPass[i-1], 2) + 2.0 * accels[i] * deltaDist));
     }
