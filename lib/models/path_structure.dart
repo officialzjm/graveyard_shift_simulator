@@ -247,7 +247,6 @@ class PathModel extends ChangeNotifier {
   void addWaypoint(Waypoint wp) {
     waypoints.add(wp);
     updateMotionProfile();
-    notifyListeners();
   }
 
   void removeWaypoint(int i) {

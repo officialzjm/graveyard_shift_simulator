@@ -93,6 +93,7 @@ class _FieldViewState extends State<FieldView> {
             final secondWaypointPos = realClickPos + Offset(10,10);
             pathModel.addWaypoint(Waypoint(pos: realClickPos, handleOut: realClickPos + Offset(0,10)));
             pathModel.addWaypoint(Waypoint(pos: secondWaypointPos, handleIn: secondWaypointPos + Offset(0,10)));
+            pathModel.updateMotionProfile();
           } else {
             final prevLast = waypoints[waypoints.length - 2];
             final last = waypoints.last;
@@ -100,6 +101,7 @@ class _FieldViewState extends State<FieldView> {
             final updatedLast = Waypoint(pos: last.pos, handleIn: last.handleIn, handleOut: newHandleOut, visible: last.visible, reversed: last.reversed);
             pathModel.updateWaypoint(waypoints.length - 1, updatedLast);
             pathModel.addWaypoint(Waypoint(pos: realClickPos, handleIn: realClickPos + computeHandleOffset(realClickPos, waypoints.last.pos)));
+            pathModel.updateMotionProfile();
           }
         },
         onSecondaryTapDown: (details) {
