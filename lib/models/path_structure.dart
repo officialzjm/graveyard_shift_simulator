@@ -134,11 +134,60 @@ class PathModel extends ChangeNotifier {
   List<Waypoint> waypoints = [];
   double startSpeed = 0.0;
   double endSpeed = 0.0;
-  List<double> times, pathTs, velocities;
+  List<double> times = {};
+  List<double> pathTs = {};
+  List<double> velocities = {};
   double duration = 0.0;
   
   void updateMotionProfile() {
-   
+    List<BezierSegment> segments = {}
+    for (i=0; i<waypoints.size(); i++) {
+      segments.add(Segment(waypoints[0].pos, waypoints[0].handleOut, waypoints[1].handleIn, waypoints[1].pos, waypoints[0].maxVel, waypoints[0].maxAccel, waypoints[0].reversed));
+    }
+    List<double> dist{0.0};
+    List<double> vels{std::min(segments[0].curvature(0.0),maxVelocity)};
+    List<double> accels{0.0};
+    pathTs.add(0.0);
+    double totalDist = 0.0;
+    
+    for (int i = 0; i < segments.size(); ++i) {
+        double length = segments[i].totalArcLength();
+        int n = std::max(8, (int)(length * 20.0));
+        for (int j = 1; j <= n; ++j) {
+            double t = j/n.toDouble();
+            pathTs.add(i.toDouble() + t);
+        
+            dist.add(totalDist + segments[i].arcLengthAtT(t));
+            double k = segments[i].curvature(t);
+            vels.add(min(segments[i].maxVel, limitSpeed(k) * maxVel));
+            accels.add(segments[i].maxAccel);
+        }
+        totalDist += length;
+    }
+    vels[vels.size() - 1] = min(path.endSpeed, vels[vels.size() - 1]);
+
+
+    int n = dist.size();
+    List<double> forwardPass(n, maxVel);
+    List<double> backwardPass(n, maxVel);
+
+    forwardPass[0] = path.startSpeed;
+    for (size_t i = 1; i < n; i++) {
+        double deltaDist = dist[i] - dist[i-1];
+        forwardPass[i] = min(maxVel,sqrt(pow(forwardPass[i-1], 2) + 2.0 * accels[i] * deltaDist));
+    }
+
+    backwardPass[n-1] = path.endSpeed;
+    for (int i = n - 2; i >= 0; i--) {
+        double deltaDist = dist[i+1] - dist[i];
+        size_t segmentIndex = (pathTs[i].toInt());
+        double a = segments[segmentIndex].maxAccel;
+        backwardPass[i] = min(maxVel,sqrt(pow(backwardPass[i+1], 2) + 2.0 * accels[i] * deltaDist));
+    }
+
+    for (size_t i = 0; i < n; i++) {
+        vels[i] = min(forwardPass[i], backwardPass[i]);
+    }
   }
   void addWaypoint(Waypoint wp) {
     waypoints.add(wp);

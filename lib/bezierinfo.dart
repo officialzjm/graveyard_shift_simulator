@@ -28,20 +28,6 @@ Offset cubicDerivative(
          (p2 - p1) * (6.0 * u * t) +
          (p3 - p2) * (3.0 * t * t);
 }
-Offset secondDerivative(
-  Offset p0,
-  Offset p1,
-  Offset p2,
-  Offset p3,
-  double t
-) {
-    double u = 1.0 - t;
-    double tt = t * t;
-
-    double dx = 6 * u * (p2.x() - 2 * p1.x() + p0.x()) + 6 * tt * (p3.x() - 2 * p2.x() + p1.x());
-    double dy = 6 * u * (p2.y() - 2 * p1.y() + p0.y()) + 6 * tt * (p3.y() - 2 * p2.y() + p1.y());
-    return Offset(dx, dy);
-}
 
 Color velocityToColor(double v) {
   final t = ((v - 0) / (maxVelocity - 0)).clamp(0.0, 1.0); //min veloc: 0
